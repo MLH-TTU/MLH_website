@@ -1,0 +1,123 @@
+// Test-specific Prisma schema using SQLite
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/test-client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./test.db"
+}
+
+model User {
+  id                      String            @id @default(cuid())
+  email                   String            @unique
+  provider                String            // AuthProvider as string
+  hasCompletedOnboarding  Boolean           @default(false)
+  
+  // Profile information
+  firstName               String?
+  lastName                String?
+  major                   String?
+  rNumber                 String?           @unique
+  universityLevel         String?           // UniversityLevel as string
+  aspiredPosition         String?
+  
+  // Social media links
+  githubUrl               String?
+  linkedinUrl             String?
+  twitterUrl              String?
+  
+  // File references
+  profilePictureId        String?
+  resumeId                String?
+  
+  // Technology skills (many-to-many)
+  technologySkills        UserTechnology[]
+  
+  // Relations
+  sessions                Session[]
+  files                   File[]
+  linkingTokens           AccountLinkingToken[]
+  
+  // Timestamps
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+  lastLoginAt             DateTime?
+  
+  @@map("users")
+}
+
+model Technology {
+  id                      String            @id @default(cuid())
+  name                    String            @unique
+  category                String            // TechnologyCategory as string
+  iconUrl                 String?
+  color                   String?
+  
+  // Relations
+  userSkills              UserTechnology[]
+  
+  createdAt               DateTime          @default(now())
+  
+  @@map("technologies")
+}
+
+model UserTechnology {
+  userId                  String
+  technologyId            String
+  
+  user                    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  technology              Technology        @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+  
+  @@id([userId, technologyId])
+  @@map("user_technologies")
+}
+
+model File {
+  id                      String            @id @default(cuid())
+  userId                  String
+  originalName            String
+  fileName                String            @unique
+  mimeType                String
+  size                    Int
+  type                    String            // FileType as string
+  storageUrl              String
+  
+  user                    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt               DateTime          @default(now())
+  
+  @@map("files")
+}
+
+model Session {
+  id                      String            @id @default(cuid())
+  userId                  String
+  token                   String            @unique
+  expiresAt               DateTime
+  
+  user                    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt               DateTime          @default(now())
+  lastAccessedAt          DateTime          @default(now())
+  
+  @@map("sessions")
+}
+
+model AccountLinkingToken {
+  id                      String            @id @default(cuid())
+  existingUserId          String
+  newEmail                String
+  newProvider             String            // AuthProvider as string
+  token                   String            @unique
+  expiresAt               DateTime
+  used                    Boolean           @default(false)
+  
+  existingUser            User              @relation(fields: [existingUserId], references: [id], onDelete: Cascade)
+  
+  createdAt               DateTime          @default(now())
+  
+  @@map("account_linking_tokens")
+}
+
