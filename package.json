@@ -8,7 +8,7 @@
     "build": "npm run build --prefix client",
     "start": "npm run dev --prefix server",
     "install:all": "npm install && npm install --prefix client && npm install --prefix server",
-    "vercel-build": "cd client && npm ci && npm run build",
+    "vercel-build": "cd client && npm ci && npm run build && cd ../server && npm ci && npx prisma generate",
     "clean-ports": "lsof -ti:3000,5001 | xargs kill -9 2>/dev/null || true",
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server"
