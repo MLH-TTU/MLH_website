@@ -5,7 +5,7 @@
       "src": "client/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist"
+        "distDir": "client/dist"
       }
     },
     {
@@ -19,9 +19,16 @@
       "dest": "/server/src/index-simple.ts"
     },
     {
-      "src": "/(.*)",
+      "src": "/auth/(.*)",
+      "dest": "/server/src/index-simple.ts"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
       "dest": "/client/dist/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/dist/index.html"
     }
-  ],
-  "outputDirectory": "client/dist"
+  ]
 }
