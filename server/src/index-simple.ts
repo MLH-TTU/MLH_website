@@ -93,6 +93,16 @@ app.get('/api/hello', async (_req: Request, res: Response) => {
   }
 });
 
+// Simple test endpoint
+app.get('/api/test', (_req: Request, res: Response) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV
+  });
+});
+
 // Health check endpoint for Vercel
 app.get('/api/health', async (_req: Request, res: Response) => {
   try {
@@ -106,6 +116,7 @@ app.get('/api/health', async (_req: Request, res: Response) => {
     res.status(503).json({ 
       status: 'Service Unavailable', 
       database: 'Disconnected',
+      error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString() 
     });
   }
