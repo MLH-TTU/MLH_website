@@ -21,11 +21,17 @@ export interface SecurityConfig {
   };
   session: {
     secret: string;
-    secure: boolean;
-    maxAge: number;
-    httpOnly: boolean;
-    sameSite: 'strict' | 'lax' | 'none';
+    resave: boolean;
+    saveUninitialized: boolean;
+    cookie: {
+      secure: boolean;
+      maxAge: number;
+      httpOnly: boolean;
+      sameSite: 'strict' | 'lax' | 'none';
+    };
     name: string;
+    rolling: boolean;
+    proxy: boolean;
   };
 }
 
@@ -156,10 +162,10 @@ export const securityHeaders = {
     },
   },
   crossOriginEmbedderPolicy: false,
-  crossOriginOpenerPolicy: { policy: "same-origin" },
-  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: "same-origin" as const },
+  crossOriginResourcePolicy: { policy: "cross-origin" as const },
   dnsPrefetchControl: { allow: false },
-  frameguard: { action: 'deny' },
+  frameguard: { action: 'deny' as const },
   hidePoweredBy: true,
   hsts: {
     maxAge: 31536000, // 1 year
@@ -170,7 +176,7 @@ export const securityHeaders = {
   noSniff: true,
   originAgentCluster: true,
   permittedCrossDomainPolicies: false,
-  referrerPolicy: { policy: "no-referrer" },
+  referrerPolicy: { policy: "no-referrer" as const },
   xssFilter: true
 };
 

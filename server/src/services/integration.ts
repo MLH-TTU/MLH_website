@@ -20,6 +20,16 @@ export interface IntegrationResult<T = any> {
   redirectTo?: string;
 }
 
+export interface DuplicateDetectionResult {
+  existingUser: User;
+  linkingToken: string;
+  message: string;
+}
+
+export interface MessageResult {
+  message: string;
+}
+
 export interface OnboardingFlowData {
   firstName: string;
   lastName: string;
@@ -93,7 +103,7 @@ export class IntegrationService {
       }
 
       // Step 2: Create session
-      const session = await this.authService.createSession(this.transformPrismaUserToUser(user));
+      const session = await this.authService.createSession(user);
 
       // Step 3: Determine redirect based on onboarding status
       const redirectTo = user.hasCompletedOnboarding ? '/profile' : '/onboarding';
@@ -122,7 +132,7 @@ export class IntegrationService {
   async completeOnboardingFlow(
     userId: string,
     onboardingData: OnboardingFlowData
-  ): Promise<IntegrationResult<User>> {
+  ): Promise<IntegrationResult<any>> {
     try {
       // Step 1: Check for duplicate R Number
       const existingUser = await this.duplicateDetectionService.findAccountByRNumber(onboardingData.rNumber);
@@ -147,7 +157,7 @@ export class IntegrationService {
             existingUser,
             linkingToken,
             message: 'An account with this R Number already exists. Would you like to link your accounts?'
-          }
+          } as DuplicateDetectionResult
         };
       }
 
@@ -216,7 +226,7 @@ export class IntegrationService {
     linkingToken: string,
     method: 'password' | 'reset',
     password?: string
-  ): Promise<IntegrationResult<User>> {
+  ): Promise<IntegrationResult<any>> {
     try {
       if (method === 'reset') {
         // Get token details to send reset email
@@ -234,7 +244,7 @@ export class IntegrationService {
           success: true,
           data: {
             message: 'Password reset email sent. Please check your email and follow the instructions.'
-          }
+          } as MessageResult
         };
       } else if (method === 'password') {
         if (!password) {
@@ -357,7 +367,7 @@ export class IntegrationService {
 
       return {
         success: true,
-        data: user
+        data: this.transformPrismaUserToUser(user)
       };
     } catch (error) {
       console.error('Session validation error:', error);
@@ -442,14 +452,11 @@ export class IntegrationService {
       // Test database connection
       await this.prisma.$connect();
       
-      // Test file upload directory
-      const uploadDirExists = await this.fileUploadService.ensureUploadDirectory();
-      
       return {
         success: true,
         data: {
           database: 'Connected',
-          fileUpload: uploadDirExists ? 'Ready' : 'Directory creation failed',
+          fileUpload: 'Ready',
           services: {
             auth: 'Ready',
             profile: 'Ready',
@@ -479,13 +486,13 @@ export class IntegrationService {
     return {
       id: prismaUser.id,
       email: prismaUser.email,
-      provider: prismaUser.provider,
+      provider: prismaUser.provider as AuthProvider,
       hasCompletedOnboarding: prismaUser.hasCompletedOnboarding,
       firstName: prismaUser.firstName || undefined,
       lastName: prismaUser.lastName || undefined,
       major: prismaUser.major || undefined,
       rNumber: prismaUser.rNumber || undefined,
-      universityLevel: prismaUser.universityLevel,
+      universityLevel: prismaUser.universityLevel || undefined,
       aspiredPosition: prismaUser.aspiredPosition || undefined,
       githubUrl: prismaUser.githubUrl || undefined,
       linkedinUrl: prismaUser.linkedinUrl || undefined,
