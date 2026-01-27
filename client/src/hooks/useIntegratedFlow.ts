@@ -7,7 +7,6 @@
 
 import { useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { apiClient } from '../utils/api';
 import { User } from '../types';
 
 export interface OnboardingData {

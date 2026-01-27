@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes, ReactNode } from 'react';
+import { ButtonHTMLAttributes, ReactNode, forwardRef } from 'react';
 import LoadingSpinner from './LoadingSpinner';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -12,7 +12,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
-const Button: React.FC<ButtonProps> = ({
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   variant = 'primary',
   size = 'md',
   loading = false,
@@ -24,7 +24,7 @@ const Button: React.FC<ButtonProps> = ({
   className = '',
   children,
   ...props
-}) => {
+}, ref) => {
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variantClasses = {
@@ -78,6 +78,7 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
+      ref={ref}
       className={buttonClasses}
       disabled={isDisabled}
       aria-disabled={isDisabled}
@@ -86,6 +87,8 @@ const Button: React.FC<ButtonProps> = ({
       {renderContent()}
     </button>
   );
-};
+});
+
+Button.displayName = 'Button';
 
 export default Button;

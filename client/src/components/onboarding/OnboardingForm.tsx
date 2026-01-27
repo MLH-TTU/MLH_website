@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { OnboardingFormData, OnboardingFormProps, UniversityLevel } from '../../types';
+import { OnboardingFormProps, UniversityLevel } from '../../types';
 import SocialMediaLinks from './SocialMediaLinks';
 import TechnologySelector from './TechnologySelector';
 import FileUpload from './FileUpload';
@@ -326,9 +326,9 @@ const OnboardingForm: React.FC<OnboardingFormProps> = ({
           }}
           onChange={handleSocialLinksChange}
           errors={{
-            githubUrl: formErrors.githubUrl?.message,
-            linkedinUrl: formErrors.linkedinUrl?.message,
-            twitterUrl: formErrors.twitterUrl?.message,
+            githubUrl: formErrors.githubUrl?.message || '',
+            linkedinUrl: formErrors.linkedinUrl?.message || '',
+            twitterUrl: formErrors.twitterUrl?.message || '',
           }}
         />
 
@@ -336,6 +336,7 @@ const OnboardingForm: React.FC<OnboardingFormProps> = ({
         <TechnologySelector
           selectedTechnologies={watchedValues.technologySkills || []}
           onSelectionChange={handleTechnologyChange}
+          availableTechnologies={[]}
         />
 
         {/* File Uploads */}

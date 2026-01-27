@@ -1,4 +1,5 @@
 // Comprehensive validation utilities
+import { useState, useEffect } from 'react';
 
 export interface ValidationResult {
   isValid: boolean;
@@ -157,10 +158,10 @@ export const useRealTimeValidation = (
   rules: ValidationRule,
   debounceMs: number = 300
 ) => {
-  const [error, setError] = React.useState<string | null>(null);
-  const [isValidating, setIsValidating] = React.useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsValidating(true);
     const timer = setTimeout(() => {
       const validationError = validateField(value, rules);

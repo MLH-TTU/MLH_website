@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import OnboardingForm from '../components/onboarding/OnboardingForm';
 import AccountLinkingModal from '../components/onboarding/AccountLinkingModal';
-import { OnboardingFormData, User, DuplicateDetectionResponse, AccountLinkingResponse } from '../types';
+import { OnboardingFormData, User, DuplicateDetectionResponse } from '../types';
 import { apiClient } from '../utils/api';
 
 const OnboardingPage: React.FC = () => {

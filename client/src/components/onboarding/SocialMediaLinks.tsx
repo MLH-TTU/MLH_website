@@ -1,33 +1,11 @@
 import React from 'react';
 import { SocialMediaLinksProps } from '../../types';
 
-// URL validation patterns for each platform
-const URL_PATTERNS = {
-  github: /^https?:\/\/(www\.)?github\.com\/[a-zA-Z0-9]([a-zA-Z0-9-]){0,38}[a-zA-Z0-9]?$/,
-  linkedin: /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/,
-  twitter: /^https?:\/\/(www\.)?(twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/?$/,
-};
-
 const SocialMediaLinks: React.FC<SocialMediaLinksProps> = ({
   links,
   onChange,
   errors = {},
 }) => {
-  const validateUrl = (url: string, platform: keyof typeof URL_PATTERNS): string | null => {
-    if (!url) return null; // Optional field
-    
-    if (!URL_PATTERNS[platform].test(url)) {
-      const platformNames = {
-        github: 'GitHub',
-        linkedin: 'LinkedIn',
-        twitter: 'X (Twitter)',
-      };
-      return `Please enter a valid ${platformNames[platform]} URL`;
-    }
-    
-    return null;
-  };
-
   const handleInputChange = (field: keyof typeof links, value: string) => {
     onChange({ ...links, [field]: value });
   };
