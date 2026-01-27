@@ -14,7 +14,23 @@ import fileRoutes from './routes/files';
 
 const app = express();
 const PORT = process.env.PORT || 5001;
-const prisma = new PrismaClient();
+
+// Initialize Prisma client with error handling
+let prisma: PrismaClient;
+try {
+  prisma = new PrismaClient({
+    log: ['error', 'warn'],
+    errorFormat: 'pretty'
+  });
+  console.log('Prisma client initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize Prisma client:', error);
+  // Create a mock prisma object to prevent crashes
+  prisma = {
+    $connect: () => Promise.reject(new Error('Prisma not initialized')),
+    $disconnect: () => Promise.resolve()
+  } as any;
+}
 
 // Security middleware
 app.use(helmet({
@@ -76,48 +92,86 @@ app.use('/api/files', fileRoutes);
 // Test database connection
 app.get('/api/hello', async (_req: Request, res: Response) => {
   try {
-    // Test database connection
-    await prisma.$connect();
+    // Test database connection with timeout
+    const connectionTest = Promise.race([
+      prisma.$connect(),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database connection timeout')), 5000)
+      )
+    ]);
+    
+    await connectionTest;
+    
     res.json({ 
       message: 'Hello World from MLH TTU Chapter!',
       database: 'Connected',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      databaseUrl: process.env.DATABASE_URL ? 'Set' : 'Not set'
     });
   } catch (error) {
     console.error('Database connection error:', error);
     res.status(500).json({ 
       message: 'Hello World from MLH TTU Chapter!',
       database: 'Disconnected',
-      error: 'Database connection failed'
+      error: error instanceof Error ? error.message : 'Database connection failed',
+      timestamp: new Date().toISOString()
     });
   }
 });
 
-// Simple test endpoint
+// Very basic endpoint for debugging
+app.get('/api/ping', (_req: Request, res: Response) => {
+  res.json({ pong: true, time: Date.now() });
+});
+
+// Simple test endpoint (no database)
 app.get('/api/test', (_req: Request, res: Response) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'Server is running',
-    timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV
-  });
+  try {
+    res.json({ 
+      status: 'OK', 
+      message: 'Server is running',
+      timestamp: new Date().toISOString(),
+      env: process.env.NODE_ENV || 'unknown',
+      nodeVersion: process.version,
+      platform: process.platform
+    });
+  } catch (error) {
+    console.error('Test endpoint error:', error);
+    res.status(500).json({
+      status: 'ERROR',
+      message: 'Test endpoint failed',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
 });
 
 // Health check endpoint for Vercel
 app.get('/api/health', async (_req: Request, res: Response) => {
   try {
-    await prisma.$connect();
+    // Test database connection with timeout
+    const connectionTest = Promise.race([
+      prisma.$connect(),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database connection timeout')), 5000)
+      )
+    ]);
+    
+    await connectionTest;
+    
     res.json({ 
       status: 'OK', 
       database: 'Connected',
-      timestamp: new Date().toISOString() 
+      timestamp: new Date().toISOString(),
+      env: process.env.NODE_ENV
     });
   } catch (error) {
+    console.error('Health check database error:', error);
     res.status(503).json({ 
       status: 'Service Unavailable', 
       database: 'Disconnected',
       error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString() 
+      timestamp: new Date().toISOString(),
+      env: process.env.NODE_ENV
     });
   }
 });
@@ -125,14 +179,42 @@ app.get('/api/health', async (_req: Request, res: Response) => {
 // Graceful shutdown
 process.on('SIGINT', async () => {
   console.log('Shutting down gracefully...');
-  await prisma.$disconnect();
+  try {
+    await prisma.$disconnect();
+  } catch (error) {
+    console.error('Error during shutdown:', error);
+  }
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
   console.log('Shutting down gracefully...');
-  await prisma.$disconnect();
+  try {
+    await prisma.$disconnect();
+  } catch (error) {
+    console.error('Error during shutdown:', error);
+  }
   process.exit(0);
+});
+
+// Global error handler
+app.use((error: any, req: any, res: any, next: any) => {
+  console.error('Global error handler:', error);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: error.message,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// 404 handler
+app.use((req: any, res: any) => {
+  res.status(404).json({
+    error: 'Not found',
+    path: req.path,
+    method: req.method,
+    timestamp: new Date().toISOString()
+  });
 });
 
 app.listen(PORT, () => {

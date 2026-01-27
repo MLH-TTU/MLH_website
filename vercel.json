@@ -11,9 +11,41 @@
     {
       "src": "server/src/index-simple.ts",
       "use": "@vercel/node"
+    },
+    {
+      "src": "server/api/*.ts",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/api/test",
+      "dest": "/server/api/test.ts"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/server/api/health.ts"
+    },
+    {
+      "src": "/api/ping",
+      "dest": "/server/api/ping.ts"
+    },
+    {
+      "src": "/api/hello",
+      "dest": "/server/api/hello.ts"
+    },
+    {
+      "src": "/api/db-health",
+      "dest": "/server/api/db-health.ts"
+    },
+    {
+      "src": "/api/env-check",
+      "dest": "/server/api/env-check.ts"
+    },
+    {
+      "src": "/api/auth/me",
+      "dest": "/server/api/auth-me.ts"
+    },
     {
       "src": "/api/(.*)",
       "dest": "/server/src/index-simple.ts"
@@ -24,7 +56,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/client/dist/index.html"
+      "dest": "/index.html"
     }
   ]
 }

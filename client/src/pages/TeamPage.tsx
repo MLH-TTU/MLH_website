@@ -144,6 +144,7 @@ function TeamPage() {
           <div className="w-16 h-1 bg-red-600 mx-auto mb-8"></div>
           <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto">
             <TextType
+              as="span"
               text={[
                 "The passionate individuals driving innovation and community at MLH TTU Chapter",
                 "Building the future of tech at Texas Tech University",
