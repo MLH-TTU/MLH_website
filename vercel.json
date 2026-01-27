@@ -1,12 +1,18 @@
 {
   "version": 2,
-  "buildCommand": "npm run build --prefix client",
-  "outputDirectory": "client/dist",
-  "functions": {
-    "server/src/index-simple.ts": {
-      "runtime": "@vercel/node@3"
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "client/dist"
+      }
+    },
+    {
+      "src": "server/src/index-simple.ts",
+      "use": "@vercel/node"
     }
-  },
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
@@ -17,14 +23,8 @@
       "dest": "/server/src/index-simple.ts"
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/client/dist/index.html"
     }
   ]
 }
