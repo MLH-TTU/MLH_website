@@ -1,0 +1,56 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is accessing their own files
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+    
+    // Helper function to validate image file types
+    function isValidImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    // Helper function to validate resume file types (PDF or DOCX)
+    function isValidResume() {
+      return request.resource.contentType == 'application/pdf' 
+        || request.resource.contentType == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    }
+    
+    // User profile pictures
+    match /users/{uid}/profile-picture/{fileName} {
+      // Users can read their own profile picture
+      allow read: if isOwner(uid);
+      
+      // Users can upload their own profile picture
+      // Must be an image and under 5MB
+      allow write: if isOwner(uid)
+        && isValidImage()
+        && request.resource.size < 5 * 1024 * 1024; // 5MB max
+    }
+    
+    // User resumes
+    match /users/{uid}/resume/{fileName} {
+      // Users can read their own resume
+      allow read: if isOwner(uid);
+      
+      // Users can upload their own resume
+      // Must be PDF or DOCX and under 10MB
+      allow write: if isOwner(uid)
+        && isValidResume()
+        && request.resource.size < 10 * 1024 * 1024; // 10MB max
+    }
+    
+    // Default deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

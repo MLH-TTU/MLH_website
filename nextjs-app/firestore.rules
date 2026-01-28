@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is accessing their own document
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+    
+    // Helper function to check if protected fields are being modified
+    function isModifyingProtectedFields() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'email']);
+    }
+    
+    // Users collection
+    match /users/{uid} {
+      // Users can read their own profile
+      allow read: if isOwner(uid);
+      
+      // Users can create their own profile (first-time auth)
+      // Must set uid to match the document ID and auth uid
+      allow create: if isOwner(uid) 
+        && request.resource.data.uid == uid
+        && request.resource.data.uid == request.auth.uid;
+      
+      // Users can update their own profile
+      // Cannot modify uid or email fields
+      allow update: if isOwner(uid) && !isModifyingProtectedFields();
+      
+      // Only server-side (Admin SDK) can delete
+      // Client-side deletions are not allowed
+      allow delete: if false;
+    }
+    
+    // Verification codes collection
+    // Only server-side operations allowed
+    match /verificationCodes/{uid} {
+      // No client-side read or write access
+      // All operations must go through server-side Admin SDK
+      allow read, write: if false;
+    }
+    
+    // Default deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
