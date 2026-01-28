@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ToastContainer';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { Button } from '@/components/ui/Button';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/lib/constants/errorMessages';
 
 export default function LoginPage() {
@@ -16,18 +17,14 @@ export default function LoginPage() {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
-  // Redirect authenticated users
+  // Redirect authenticated users after login
   useEffect(() => {
     if (user && !loading) {
-      // Temporarily disabled onboarding redirect for testing SSO
-      // if (!user.hasCompletedOnboarding) {
-      //   router.push('/onboarding');
-      // } else {
-      //   router.push('/profile');
-      // }
-      
-      // For now, just redirect to profile page
-      router.push('/profile');
+      if (!user.hasCompletedOnboarding) {
+        router.push('/onboarding');
+      } else {
+        router.push('/profile');
+      }
     }
   }, [user, loading, router]);
 
@@ -124,10 +121,12 @@ export default function LoginPage() {
             <div className={`space-y-6 ${
               !prefersReducedMotion ? 'animate-on-load animate-fade-in animation-delay-400' : ''
             }`}>
-              <button
+              <Button
                 onClick={handleGoogleSignIn}
                 disabled={isSigningIn}
-                className="group relative w-full flex justify-center items-center py-4 px-6 border-2 border-gray-300 dark:border-gray-600 text-base font-medium rounded-full text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg min-h-[56px]"
+                variant="outline"
+                size="lg"
+                className="w-full min-h-[56px]"
               >
                 {isSigningIn ? (
                   <>
@@ -161,7 +160,7 @@ export default function LoginPage() {
                     <span>Continue with Google</span>
                   </>
                 )}
-              </button>
+              </Button>
 
               {/* Divider */}
               <div className="relative">

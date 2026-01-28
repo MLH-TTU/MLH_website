@@ -89,13 +89,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      {/* Toast container - fixed position at top right */}
+      {/* Toast container - fixed position at top center */}
       <div
-        className="fixed top-4 right-4 z-50 space-y-4 pointer-events-none"
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 space-y-4 pointer-events-none"
         aria-live="polite"
         aria-atomic="true"
       >
-        <div className="flex flex-col items-end space-y-4 pointer-events-auto">
+        <div className="flex flex-col items-center space-y-4 pointer-events-auto">
           {toasts.map((toast) => (
             <Toast
               key={toast.id}

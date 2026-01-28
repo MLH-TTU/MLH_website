@@ -123,13 +123,13 @@ export default function FileUploadsStep({ data, onNext, onBack }: FileUploadsSte
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">File Uploads</h2>
-        <p className="text-gray-600">Upload your profile picture and resume (optional)</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">File Uploads</h2>
+        <p className="text-gray-600 dark:text-gray-300">Upload your profile picture and resume (optional)</p>
       </div>
 
       {/* Profile Picture Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
           Profile Picture
         </label>
         <div
@@ -200,7 +200,7 @@ export default function FileUploadsStep({ data, onNext, onBack }: FileUploadsSte
 
       {/* Resume Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
           Resume
         </label>
         <div

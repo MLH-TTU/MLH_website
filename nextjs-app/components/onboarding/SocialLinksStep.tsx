@@ -57,12 +57,12 @@ export default function SocialLinksStep({ data, onNext, onBack }: SocialLinksSte
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Social Links</h2>
-        <p className="text-gray-600">Connect your social profiles (all optional)</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Social Links</h2>
+        <p className="text-gray-600 dark:text-gray-300">Connect your social profiles (all optional)</p>
       </div>
 
       <div>
-        <label htmlFor="githubUrl" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="githubUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
           GitHub URL
         </label>
         <input
@@ -81,7 +81,7 @@ export default function SocialLinksStep({ data, onNext, onBack }: SocialLinksSte
       </div>
 
       <div>
-        <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
           LinkedIn URL
         </label>
         <input
@@ -100,7 +100,7 @@ export default function SocialLinksStep({ data, onNext, onBack }: SocialLinksSte
       </div>
 
       <div>
-        <label htmlFor="twitterUrl" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="twitterUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
           Twitter URL
         </label>
         <input

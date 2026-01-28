@@ -58,13 +58,13 @@ export default function ProfileInfoStep({ data, onNext }: ProfileInfoStepProps) 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Profile Information</h2>
-        <p className="text-gray-600">Tell us about yourself</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Profile Information</h2>
+        <p className="text-gray-600 dark:text-gray-300">Tell us about yourself</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
             First Name *
           </label>
           <input
@@ -82,7 +82,7 @@ export default function ProfileInfoStep({ data, onNext }: ProfileInfoStepProps) 
         </div>
 
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
             Last Name *
           </label>
           <input
@@ -101,7 +101,7 @@ export default function ProfileInfoStep({ data, onNext }: ProfileInfoStepProps) 
       </div>
 
       <div>
-        <label htmlFor="major" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="major" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
           Major *
         </label>
         <input
@@ -119,7 +119,7 @@ export default function ProfileInfoStep({ data, onNext }: ProfileInfoStepProps) 
       </div>
 
       <div>
-        <label htmlFor="universityLevel" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="universityLevel" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
           University Level *
         </label>
         <select
@@ -144,7 +144,7 @@ export default function ProfileInfoStep({ data, onNext }: ProfileInfoStepProps) 
       </div>
 
       <div>
-        <label htmlFor="aspiredPosition" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="aspiredPosition" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
           Aspired Position (Optional)
         </label>
         <input

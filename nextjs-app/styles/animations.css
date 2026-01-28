@@ -62,6 +62,18 @@
   }
 }
 
+/* Slide down animation for toasts */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Utility classes for animations */
 .animate-fade-in {
   animation: fadeIn 400ms ease-out forwards;
@@ -81,6 +93,10 @@
 
 .animate-logo {
   animation: scaleInBounce 800ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-slide-down {
+  animation: slideDown 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* Animation delays for staggered effects */

@@ -59,14 +59,14 @@ export default function VerificationCodeStep({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Enter Verification Code</h2>
-        <p className="text-gray-600">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Enter Verification Code</h2>
+        <p className="text-gray-600 dark:text-gray-300">
           We've sent a 6-digit code to <span className="font-medium">{ttuEmail}</span>
         </p>
       </div>
 
       <div>
-        <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="code" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
           Verification Code *
         </label>
         <input
@@ -83,7 +83,7 @@ export default function VerificationCodeStep({
           maxLength={6}
         />
         {error && (
-          <p className="mt-1 text-sm text-red-600">{error}</p>
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>
         )}
       </div>
 

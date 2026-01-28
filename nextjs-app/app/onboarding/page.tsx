@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ToastContainer';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/lib/constants/errorMessages';
 import { updateUserProfile } from '@/lib/services/userProfile.client';
 import { uploadProfilePicture, uploadResume } from '@/lib/services/fileUpload';
@@ -34,41 +36,28 @@ export default function OnboardingPage() {
   const [error, setError] = useState<string | null>(null);
   const [onboardingComplete, setOnboardingComplete] = useState(false);
 
+  // Redirect if onboarding is already complete
+  useEffect(() => {
+    if (user && user.hasCompletedOnboarding) {
+      router.push('/profile');
+    }
+  }, [user, router]);
+
   // Cleanup incomplete account when user leaves the page
   useEffect(() => {
     const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
-      if (!onboardingComplete && user) {
+      if (!onboardingComplete && user && !user.hasCompletedOnboarding) {
         // Warn user they'll lose their account
         e.preventDefault();
         e.returnValue = 'If you leave now, your account will be deleted and you\'ll need to start over.';
       }
     };
 
-    const handleVisibilityChange = async () => {
-      if (document.hidden && !onboardingComplete && user) {
-        // User switched tabs/minimized - cleanup account
-        await cleanupIncompleteAccount();
-      }
-    };
-
-    const handleRouteChange = async () => {
-      if (!onboardingComplete && user) {
-        // User navigated away - cleanup account
-        await cleanupIncompleteAccount();
-      }
-    };
-
     window.addEventListener('beforeunload', handleBeforeUnload);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
     
-    // Cleanup on unmount (navigation away)
+    // Cleanup on unmount only if navigating away from onboarding
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      
-      if (!onboardingComplete && user) {
-        cleanupIncompleteAccount();
-      }
     };
   }, [user, onboardingComplete]);
 
@@ -245,29 +234,51 @@ export default function OnboardingPage() {
   };
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
+    router.push('/');
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 font-sans transition-colors duration-200">
+      {/* Floating Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 py-3">
+        <div className="mx-auto max-w-4xl">
+          <div className="mx-auto w-fit rounded-full px-8 py-3 bg-white/10 dark:bg-gray-800/30 backdrop-blur-[20px] backdrop-saturate-[180%] border border-white/20 dark:border-gray-700/30 shadow-[0_8px_32px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.3)]">
+            <div className="flex items-center justify-between min-w-[300px] gap-6">
+              <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+                <img src="https://static.mlh.io/brand-assets/logo/official/mlh-logo-color.png" alt="MLH Logo" className="h-6 w-auto" />
+                <div className="h-7 w-px bg-gray-400"></div>
+                <img src="https://www.ttu.edu/traditions/images/DoubleT.gif" alt="TTU Logo" className="h-6 w-auto" />
+              </Link>
+              <ThemeToggle />
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <div className="pt-32 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
+        {/* Welcome Title */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-3 transition-colors duration-200">
+            Welcome! Let's Get Started
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300 transition-colors duration-200">
+            Complete your profile to join the MLH TTU community
+          </p>
+        </div>
+
         {/* Progress Indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             {STEPS.map((step, index) => (
               <div key={step} className="flex items-center">
                 <div
-                  className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                  className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-colors ${
                     index <= currentStep
                       ? 'border-red-600 bg-red-600 text-white'
-                      : 'border-gray-300 bg-white text-gray-500'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                   }`}
                 >
                   {index < currentStep ? (
@@ -284,8 +295,8 @@ export default function OnboardingPage() {
                 </div>
                 {index < STEPS.length - 1 && (
                   <div
-                    className={`w-12 sm:w-20 h-1 mx-2 ${
-                      index < currentStep ? 'bg-red-600' : 'bg-gray-300'
+                    className={`w-12 sm:w-20 h-1 mx-2 transition-colors ${
+                      index < currentStep ? 'bg-red-600' : 'bg-gray-300 dark:bg-gray-600'
                     }`}
                   />
                 )}
@@ -296,8 +307,8 @@ export default function OnboardingPage() {
             {STEPS.map((step, index) => (
               <div
                 key={step}
-                className={`text-xs sm:text-sm ${
-                  index === currentStep ? 'font-medium text-red-600' : 'text-gray-500'
+                className={`text-xs sm:text-sm transition-colors ${
+                  index === currentStep ? 'font-medium text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'
                 }`}
                 style={{ width: '80px', textAlign: 'center' }}
               >
@@ -308,9 +319,9 @@ export default function OnboardingPage() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 sm:p-8 transition-colors duration-200">
           {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
               <div className="flex">
                 <svg
                   className="h-5 w-5 text-red-400"
@@ -331,7 +342,7 @@ export default function OnboardingPage() {
           {isSubmitting ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Completing your profile...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-300">Completing your profile...</p>
             </div>
           ) : (
             <>
@@ -373,6 +384,7 @@ export default function OnboardingPage() {
             </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

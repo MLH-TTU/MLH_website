@@ -2,6 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent flash of light theme on page load */
+html {
+  background-color: #ffffff;
+  color-scheme: light;
+}
+
+html.dark {
+  background-color: #111827;
+  color-scheme: dark;
+}
+
+/* Prevent navbar flash - apply dark styles immediately */
+@media (prefers-color-scheme: dark) {
+  html:not(.light) {
+    background-color: #111827;
+  }
+  
+  /* Target navbar glassmorphism backgrounds before React hydrates */
+  html:not(.light) nav [class*="bg-white/10"] {
+    background-color: rgba(31, 41, 55, 0.3) !important;
+  }
+  
+  html:not(.light) nav [class*="backdrop-blur"] {
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

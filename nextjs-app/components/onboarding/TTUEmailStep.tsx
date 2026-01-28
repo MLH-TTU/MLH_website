@@ -76,14 +76,14 @@ export default function TTUEmailStep({ data, onNext, onBack }: TTUEmailStepProps
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">TTU Email Verification</h2>
-        <p className="text-gray-600">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">TTU Email Verification</h2>
+        <p className="text-gray-600 dark:text-gray-300">
           Enter your Texas Tech University email address to verify your account
         </p>
       </div>
 
       <div>
-        <label htmlFor="ttuEmail" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="ttuEmail" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
           TTU Email Address *
         </label>
         <input
@@ -98,9 +98,9 @@ export default function TTUEmailStep({ data, onNext, onBack }: TTUEmailStepProps
           } ${isChecking ? 'bg-gray-100 cursor-not-allowed' : ''}`}
         />
         {errors.ttuEmail && (
-          <p className="mt-1 text-sm text-red-600">{errors.ttuEmail}</p>
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.ttuEmail}</p>
         )}
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
           A verification code will be sent to this email address
         </p>
       </div>

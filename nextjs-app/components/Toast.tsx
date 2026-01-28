@@ -35,7 +35,7 @@ export function Toast({ id, type, message, duration = 5000, onClose, onRetry }: 
       case 'success':
         return (
           <svg
-            className="h-5 w-5 text-green-400"
+            className={`h-6 w-6 ${getIconColor()}`}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"
@@ -51,7 +51,7 @@ export function Toast({ id, type, message, duration = 5000, onClose, onRetry }: 
       case 'error':
         return (
           <svg
-            className="h-5 w-5 text-red-400"
+            className={`h-6 w-6 ${getIconColor()}`}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"
@@ -67,7 +67,7 @@ export function Toast({ id, type, message, duration = 5000, onClose, onRetry }: 
       case 'warning':
         return (
           <svg
-            className="h-5 w-5 text-yellow-400"
+            className={`h-6 w-6 ${getIconColor()}`}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"
@@ -83,7 +83,7 @@ export function Toast({ id, type, message, duration = 5000, onClose, onRetry }: 
       case 'info':
         return (
           <svg
-            className="h-5 w-5 text-blue-400"
+            className={`h-6 w-6 ${getIconColor()}`}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"
@@ -102,69 +102,80 @@ export function Toast({ id, type, message, duration = 5000, onClose, onRetry }: 
   const getBackgroundColor = () => {
     switch (type) {
       case 'success':
-        return 'bg-green-50';
+        return 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700';
       case 'error':
-        return 'bg-red-50';
+        return 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700';
       case 'warning':
-        return 'bg-yellow-50';
+        return 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700';
       case 'info':
-        return 'bg-blue-50';
+        return 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700';
     }
   };
 
   const getTextColor = () => {
+    return 'text-gray-900 dark:text-white';
+  };
+
+  const getAccentColor = () => {
     switch (type) {
       case 'success':
-        return 'text-green-800';
+        return 'bg-green-500';
       case 'error':
-        return 'text-red-800';
+        return 'bg-red-500';
       case 'warning':
-        return 'text-yellow-800';
+        return 'bg-yellow-500';
       case 'info':
-        return 'text-blue-800';
+        return 'bg-blue-500';
     }
   };
 
-  const getButtonColor = () => {
+  const getIconColor = () => {
     switch (type) {
       case 'success':
-        return 'text-green-600 hover:text-green-500';
+        return 'text-green-600 dark:text-green-400';
       case 'error':
-        return 'text-red-600 hover:text-red-500';
+        return 'text-red-600 dark:text-red-400';
       case 'warning':
-        return 'text-yellow-600 hover:text-yellow-500';
+        return 'text-yellow-600 dark:text-yellow-400';
       case 'info':
-        return 'text-blue-600 hover:text-blue-500';
+        return 'text-blue-600 dark:text-blue-400';
     }
   };
 
   return (
     <div
-      className={`${getBackgroundColor()} rounded-lg p-4 shadow-lg transition-all duration-300 ease-in-out`}
+      className={`${getBackgroundColor()} border rounded-xl p-4 shadow-lg transition-all duration-300 ease-in-out max-w-md w-full animate-slide-down relative overflow-hidden`}
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
     >
-      <div className="flex items-start">
-        <div className="flex-shrink-0">{getIcon()}</div>
-        <div className="ml-3 flex-1">
-          <p className={`text-sm font-medium ${getTextColor()}`}>{message}</p>
+      {/* Simple colored left border accent */}
+      <div className={`absolute top-0 left-0 bottom-0 w-1 ${getAccentColor()}`}></div>
+      
+      <div className="flex items-start gap-3 pl-2">
+        <div className={`flex-shrink-0 ${getIconColor()}`}>
+          {getIcon()}
+        </div>
+        <div className="flex-1 pt-0.5">
+          <p className={`text-sm font-medium ${getTextColor()}`}>
+            {message}
+          </p>
           {onRetry && type === 'error' && (
             <button
               onClick={() => {
                 onRetry();
                 onClose(id);
               }}
-              className={`mt-2 text-sm font-medium ${getButtonColor()} underline focus:outline-none`}
+              className={`mt-2 text-sm font-medium ${getIconColor()} hover:underline focus:outline-none`}
             >
               Try again
             </button>
           )}
         </div>
-        <div className="ml-4 flex-shrink-0 flex">
+        <div className="flex-shrink-0">
           <button
             onClick={() => onClose(id)}
-            className={`inline-flex ${getTextColor()} hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-${type}-50 focus:ring-${type}-600 rounded-md`}
+            className={`inline-flex text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none rounded-lg p-1 transition-colors`}
             aria-label="Close notification"
           >
             <svg
