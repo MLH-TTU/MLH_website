@@ -234,8 +234,21 @@ export default function OnboardingPage() {
   };
 
   if (!user) {
-    router.push('/');
-    return null;
+    // Use useEffect for client-side redirect to avoid SSR issues
+    useEffect(() => {
+      if (!user) {
+        router.push('/');
+      }
+    }, [user, router]);
+    
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
