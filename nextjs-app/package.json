@@ -10,8 +10,12 @@
     "verify:profiles": "tsx --env-file=.env.local verify-user-profiles.ts"
   },
   "dependencies": {
+    "@radix-ui/react-toast": "^1.2.15",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "firebase": "^11.10.0",
     "firebase-admin": "^13.0.2",
+    "lucide-react": "^0.563.0",
     "next": "^15.0.0",
     "next-firebase-auth-edge": "^1.11.1",
     "react": "^19.2.4",
@@ -19,6 +23,7 @@
     "react-hook-form": "^7.54.2",
     "resend": "^6.9.1",
     "server-only": "^0.0.1",
+    "tailwind-merge": "^3.4.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {

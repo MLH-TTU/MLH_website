@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { z } from 'zod';
-import { checkTTUEmailExists } from '@/lib/services/userProfile.client';
 
 // Validation schema for TTU email
 const ttuEmailSchema = z.object({
@@ -33,11 +32,21 @@ export default function TTUEmailStep({ data, onNext, onBack }: TTUEmailStepProps
       const validated = ttuEmailSchema.parse(formData);
       setErrors({});
       
-      // Check for duplicate
+      // Check for duplicate via API route
       setIsChecking(true);
-      const exists = await checkTTUEmailExists(validated.ttuEmail);
+      const response = await fetch('/api/check-ttu-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ttuEmail: validated.ttuEmail }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to check email');
+      }
       
-      if (exists) {
+      if (result.exists) {
         setErrors({
           ttuEmail: 'This TTU email is already registered to another account.',
         });
@@ -47,7 +56,7 @@ export default function TTUEmailStep({ data, onNext, onBack }: TTUEmailStepProps
       
       setIsChecking(false);
       onNext(validated);
-    } catch (error) {
+    } catch (error: any) {
       setIsChecking(false);
       if (error instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
@@ -59,7 +68,7 @@ export default function TTUEmailStep({ data, onNext, onBack }: TTUEmailStepProps
         setErrors(newErrors);
       } else {
         setErrors({
-          ttuEmail: 'Failed to verify email. Please try again.',
+          ttuEmail: error.message || 'Failed to verify email. Please try again.',
         });
       }
     }
@@ -136,7 +145,7 @@ export default function TTUEmailStep({ data, onNext, onBack }: TTUEmailStepProps
           type="button"
           onClick={onBack}
           disabled={isChecking}
-          className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           Back
         </button>

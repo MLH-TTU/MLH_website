@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ToastContainer';
+import { useToast } from '@/hooks/useToastCompat';
 import { SUCCESS_MESSAGES } from '@/lib/constants/errorMessages';
 import { ThemeToggle } from '@/components/ThemeToggle';
 

@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ToastContainer';
+import { useToast } from '@/hooks/useToastCompat';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@/lib/constants/errorMessages';
 import { updateUserProfile } from '@/lib/services/userProfile.client';
 import { uploadProfilePicture, uploadResume } from '@/lib/services/fileUpload';
@@ -26,7 +27,7 @@ const STEPS = [
 ] as const;
 
 export default function OnboardingPage() {
-  const { user, refreshUser, signOut } = useAuth();
+  const { user, refreshUser, signOut, loading } = useAuth();
   const router = useRouter();
   const toast = useToast();
   const [currentStep, setCurrentStep] = useState(0);
@@ -208,20 +209,25 @@ export default function OnboardingPage() {
 
       // Update user profile with all collected data
       try {
-        await updateUserProfile(user.uid, {
+        // Build update object, only including defined values
+        const profileUpdate: any = {
           firstName: formData.firstName,
           lastName: formData.lastName,
           major: formData.major,
           universityLevel: formData.universityLevel,
           aspiredPosition: formData.aspiredPosition,
-          githubUrl: formData.githubUrl || undefined,
-          linkedinUrl: formData.linkedinUrl || undefined,
-          twitterUrl: formData.twitterUrl || undefined,
           ttuEmail: formData.ttuEmail,
-          profilePictureId,
-          resumeId,
           hasCompletedOnboarding: true,
-        });
+        };
+
+        // Only add optional fields if they have values
+        if (formData.githubUrl) profileUpdate.githubUrl = formData.githubUrl;
+        if (formData.linkedinUrl) profileUpdate.linkedinUrl = formData.linkedinUrl;
+        if (formData.twitterUrl) profileUpdate.twitterUrl = formData.twitterUrl;
+        if (profilePictureId) profileUpdate.profilePictureId = profilePictureId;
+        if (resumeId) profileUpdate.resumeId = resumeId;
+
+        await updateUserProfile(user.uid, profileUpdate);
 
         // Mark onboarding as complete to prevent cleanup
         setOnboardingComplete(true);
@@ -246,15 +252,8 @@ export default function OnboardingPage() {
     }
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading...</p>
-        </div>
-      </div>
-    );
+  if (loading || !user) {
+    return <LoadingScreen message="Loading onboarding..." />;
   }
 
   return (

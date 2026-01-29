@@ -36,29 +36,35 @@ export async function sendVerificationCode(
   ttuEmail: string,
   uid: string
 ): Promise<void> {
-  const db = getAdminFirestore();
-  const code = generateVerificationCode();
-  
-  // Calculate expiration time (10 minutes from now)
-  const now = Timestamp.now();
-  const expiresAt = Timestamp.fromMillis(now.toMillis() + 10 * 60 * 1000);
-  
-  // Store verification code in Firestore
-  const verificationData: VerificationCode = {
-    code,
-    email: ttuEmail,
-    uid,
-    createdAt: now,
-    expiresAt,
-    attempts: 0,
-  };
-  
   try {
+    const db = getAdminFirestore();
+    const code = generateVerificationCode();
+    
+    // Calculate expiration time (10 minutes from now)
+    const now = Timestamp.now();
+    const expiresAt = Timestamp.fromMillis(now.toMillis() + 10 * 60 * 1000);
+    
+    // Store verification code in Firestore
+    const verificationData: VerificationCode = {
+      code,
+      email: ttuEmail,
+      uid,
+      createdAt: now,
+      expiresAt,
+      attempts: 0,
+    };
+    
+    console.log('Attempting to store verification code for UID:', uid);
+    
     // Store in verificationCodes collection with UID as document ID
     await db.collection('verificationCodes').doc(uid).set(verificationData);
     
+    console.log('Verification code stored successfully');
+    
     // Send email using Resend
-    await resend.emails.send({
+    console.log('Sending verification email to:', ttuEmail);
+    
+    const emailResult = await resend.emails.send({
       from: 'MLH TTU <noreply@mlhttu.org>',
       to: ttuEmail,
       subject: 'Verify your TTU Email - MLH TTU',
@@ -97,8 +103,17 @@ export async function sendVerificationCode(
         </html>
       `,
     });
-  } catch (error) {
-    console.error('Error sending verification code:', error);
+    
+    console.log('Verification email sent successfully:', emailResult);
+  } catch (error: any) {
+    console.error('Error in sendVerificationCode:', error);
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
+    
+    if (error.code === 'permission-denied' || error.message?.includes('permission')) {
+      throw new Error('Database permission error. Please contact support.');
+    }
+    
     throw new Error('Failed to send verification code. Please try again.');
   }
 }

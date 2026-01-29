@@ -48,8 +48,16 @@ let adminFirestore: Firestore;
 try {
   const config = validateAdminConfig();
 
+  console.log('Firebase Admin Config:', {
+    projectId: config.projectId,
+    clientEmail: config.clientEmail,
+    privateKeyLength: config.privateKey?.length || 0,
+    hasPrivateKey: !!config.privateKey,
+  });
+
   // Check if Firebase Admin app is already initialized
   if (!getApps().length) {
+    console.log('Initializing new Firebase Admin app...');
     adminApp = initializeApp({
       credential: cert({
         projectId: config.projectId,
@@ -57,13 +65,17 @@ try {
         privateKey: config.privateKey,
       }),
     });
+    console.log('Firebase Admin app initialized successfully');
   } else {
+    console.log('Using existing Firebase Admin app');
     adminApp = getApps()[0];
   }
 
   // Initialize Firebase Admin services
   adminAuth = getAuth(adminApp);
   adminFirestore = getFirestore(adminApp);
+  
+  console.log('Firebase Admin services initialized');
 } catch (error) {
   console.error('Firebase Admin initialization error:', error);
   throw error;

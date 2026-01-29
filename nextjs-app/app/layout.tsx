@@ -4,8 +4,8 @@ import "../styles/themes.css";
 import "../styles/animations.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { ToastProvider } from "@/components/ToastContainer";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "MLH TTU Chapter",
@@ -24,8 +24,12 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               /* Prevent flash of unstyled content */
-              html { background-color: #ffffff; }
-              html.dark { background-color: #111827; }
+              html { 
+                background: linear-gradient(to bottom right, #f9fafb, #ffffff, #f3f4f6);
+              }
+              html.dark { 
+                background: linear-gradient(to bottom right, #111827, #1f2937, #111827);
+              }
               
               /* Ensure body inherits background immediately */
               body { 
@@ -46,22 +50,22 @@ export default function RootLayout({
                   if (theme === 'dark') {
                     root.classList.add('dark');
                     root.setAttribute('data-theme', 'dark');
-                    root.style.backgroundColor = '#111827';
+                    root.style.background = 'linear-gradient(to bottom right, #111827, #1f2937, #111827)';
                     root.style.colorScheme = 'dark';
                   } else if (theme === 'light') {
                     root.classList.remove('dark');
                     root.setAttribute('data-theme', 'light');
-                    root.style.backgroundColor = '#ffffff';
+                    root.style.background = 'linear-gradient(to bottom right, #f9fafb, #ffffff, #f3f4f6)';
                     root.style.colorScheme = 'light';
                   } else {
                     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                     if (prefersDark) {
                       root.classList.add('dark');
                       root.setAttribute('data-theme', 'dark');
-                      root.style.backgroundColor = '#111827';
+                      root.style.background = 'linear-gradient(to bottom right, #111827, #1f2937, #111827)';
                       root.style.colorScheme = 'dark';
                     } else {
-                      root.style.backgroundColor = '#ffffff';
+                      root.style.background = 'linear-gradient(to bottom right, #f9fafb, #ffffff, #f3f4f6)';
                       root.style.colorScheme = 'light';
                     }
                   }
@@ -75,7 +79,8 @@ export default function RootLayout({
         <ThemeProvider>
           <ErrorBoundary>
             <AuthProvider>
-              <ToastProvider>{children}</ToastProvider>
+              {children}
+              <Toaster />
             </AuthProvider>
           </ErrorBoundary>
         </ThemeProvider>

@@ -123,6 +123,13 @@ export async function updateUserProfile(
     delete (updateData as any).uid;
     delete (updateData as any).email;
     
+    // Remove undefined values (Firestore doesn't support undefined)
+    Object.keys(updateData).forEach(key => {
+      if ((updateData as any)[key] === undefined) {
+        delete (updateData as any)[key];
+      }
+    });
+    
     await updateDoc(userRef, updateData);
   } catch (error) {
     console.error('Error updating user profile:', error);

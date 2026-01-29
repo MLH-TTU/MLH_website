@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/Button';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,11 +15,6 @@ export default function LandingPage() {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
-  
-  // Scroll animations for different sections
-  const aboutSection = useScrollAnimation(0.2);
-  const eventsSection = useScrollAnimation(0.2);
-  const eventCardsSection = useScrollAnimation(0.1);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +25,11 @@ export default function LandingPage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Show loading screen while auth state is being determined
+  if (loading) {
+    return <LoadingScreen message="Loading..." />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 font-sans transition-colors duration-200">
@@ -298,7 +298,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <main className="min-h-screen flex items-center justify-center px-4 pt-24">
+      <main className="min-h-screen flex items-center justify-center px-4 pt-32 md:pt-36 pb-20">
         <div className="text-center max-w-4xl mx-auto">
           {/* Animated MLH Logo */}
           <div className="mb-12 flex justify-center">
@@ -352,19 +352,12 @@ export default function LandingPage() {
       </main>
 
       {/* Who Are We Section */}
-      <section id="about" className="py-20 bg-gray-50 dark:bg-gray-800 transition-colors duration-200">
+      <section id="about" className="py-20 bg-gray-100 dark:bg-gray-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left side - Image */}
             <div 
-              ref={aboutSection.ref}
-              className={`relative transition-all duration-700 ${
-                !prefersReducedMotion && aboutSection.isVisible
-                  ? 'opacity-100 translate-x-0'
-                  : !prefersReducedMotion
-                  ? 'opacity-0 -translate-x-12'
-                  : ''
-              }`}
+              className="relative"
             >
               {/* Creative MLH Trust Badge decorations */}
               {/* Top right badge - rotated */}
@@ -420,13 +413,7 @@ export default function LandingPage() {
             </div>
 
             {/* Right side - Content */}
-            <div className={`space-y-8 transition-all duration-700 delay-200 ${
-              !prefersReducedMotion && aboutSection.isVisible
-                ? 'opacity-100 translate-x-0'
-                : !prefersReducedMotion
-                ? 'opacity-0 translate-x-12'
-                : ''
-            }`}>
+            <div className="space-y-8">
               <div>
                 <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6 transition-colors duration-200">
                   Who are we
@@ -463,14 +450,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-8">
           {/* Section Header */}
           <div 
-            ref={eventsSection.ref}
-            className={`text-center mb-16 transition-all duration-700 ${
-              !prefersReducedMotion && eventsSection.isVisible
-                ? 'opacity-100 translate-y-0'
-                : !prefersReducedMotion
-                ? 'opacity-0 translate-y-8'
-                : ''
-            }`}
+            className="text-center mb-16"
           >
             <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6 transition-colors duration-200">
               Upcoming Events
@@ -515,14 +495,7 @@ export default function LandingPage() {
 
           {/* Event Types Preview */}
           <div 
-            ref={eventCardsSection.ref}
-            className={`mt-20 grid md:grid-cols-3 gap-6 transition-all duration-700 ${
-              !prefersReducedMotion && eventCardsSection.isVisible
-                ? 'opacity-100 translate-y-0'
-                : !prefersReducedMotion
-                ? 'opacity-0 translate-y-12'
-                : ''
-            }`}
+            className="mt-20 grid md:grid-cols-3 gap-6"
           >
             {/* Hackathons Card */}
             <div className="group relative bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-8 transition-all duration-300 hover:border-red-500 dark:hover:border-red-500 hover:shadow-xl hover:-translate-y-1">
