@@ -52,6 +52,13 @@ export default function ProfilePage() {
     }
   }, [user?.uid]);
 
+  // Use useEffect for client-side redirect to avoid SSR issues - must be at top level before any returns
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/');
+    }
+  }, [user, loading, router]);
+
   const loadFileUrls = async () => {
     if (!user) return;
     try {
@@ -158,13 +165,6 @@ export default function ProfilePage() {
   }
 
   if (!user) {
-    // Use useEffect for client-side redirect to avoid SSR issues
-    useEffect(() => {
-      if (!user) {
-        router.push('/');
-      }
-    }, [user, router]);
-    
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
         <div className="text-center">

@@ -43,6 +43,13 @@ export default function OnboardingPage() {
     }
   }, [user, router]);
 
+  // Use useEffect for client-side redirect to avoid SSR issues - must be at top level
+  useEffect(() => {
+    if (!user) {
+      router.push('/');
+    }
+  }, [user, router]);
+
   // Cleanup incomplete account when user leaves the page
   useEffect(() => {
     const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
@@ -234,13 +241,6 @@ export default function OnboardingPage() {
   };
 
   if (!user) {
-    // Use useEffect for client-side redirect to avoid SSR issues
-    useEffect(() => {
-      if (!user) {
-        router.push('/');
-      }
-    }, [user, router]);
-    
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
         <div className="text-center">
