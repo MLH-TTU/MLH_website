@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cleanupExpiredAccounts } from '@/lib/services/ttuEmailVerification';
+// import { cleanupExpiredAccounts } from '@/lib/services/ttuEmailVerification';
 
 /**
  * API route to clean up expired accounts
@@ -7,8 +7,11 @@ import { cleanupExpiredAccounts } from '@/lib/services/ttuEmailVerification';
  * 
  * For security, you should add authentication to this endpoint in production
  * (e.g., check for a secret token in the Authorization header)
+ * 
+ * NOTE: This functionality is currently disabled. 
+ * Implement cleanupExpiredAccounts in ttuEmailVerification service if needed.
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     // Optional: Add authentication check here
     // const authHeader = request.headers.get('authorization');
@@ -16,12 +19,12 @@ export async function POST(request: NextRequest) {
     //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     // }
     
-    const cleanedCount = await cleanupExpiredAccounts();
+    // const cleanedCount = await cleanupExpiredAccounts();
     
     return NextResponse.json({
       success: true,
-      message: `Cleaned up ${cleanedCount} expired accounts`,
-      cleanedCount,
+      message: 'Cleanup endpoint is currently disabled',
+      cleanedCount: 0,
     });
   } catch (error) {
     console.error('Error in cleanup endpoint:', error);
