@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { z } from 'zod';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Validation schema for profile info
 const profileInfoSchema = z.object({
@@ -20,8 +21,31 @@ interface ProfileInfoStepProps {
 }
 
 export default function ProfileInfoStep({ data, onNext }: ProfileInfoStepProps) {
+  const { user } = useAuth();
   const [formData, setFormData] = useState<Partial<ProfileInfoData>>(data);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Auto-populate first and last name from Google SSO if available
+  useEffect(() => {
+    if (user && user.displayName && !formData.firstName && !formData.lastName) {
+      const nameParts = user.displayName.trim().split(' ');
+      if (nameParts.length >= 2) {
+        const firstName = nameParts[0];
+        const lastName = nameParts.slice(1).join(' '); // Handle middle names
+        setFormData((prev) => ({
+          ...prev,
+          firstName,
+          lastName,
+        }));
+      } else if (nameParts.length === 1) {
+        // If only one name part, use it as first name
+        setFormData((prev) => ({
+          ...prev,
+          firstName: nameParts[0],
+        }));
+      }
+    }
+  }, [user, formData.firstName, formData.lastName]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

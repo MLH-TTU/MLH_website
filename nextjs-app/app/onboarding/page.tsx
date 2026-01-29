@@ -155,6 +155,12 @@ export default function OnboardingPage() {
           return;
         }
 
+        // If rate limited, show error
+        if (result.rateLimited) {
+          toast.showError('Too many failed attempts. Please wait 5 minutes before trying again.');
+          return;
+        }
+
         throw new Error(result.error || ERROR_MESSAGES.VERIFICATION_CODE_INVALID);
       }
     } catch (err: any) {

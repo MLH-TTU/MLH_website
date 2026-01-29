@@ -59,7 +59,7 @@ export async function sendVerificationCode(
     
     // Send email using Resend
     await resend.emails.send({
-      from: 'MLH TTU <onboarding@resend.dev>', // Update this with your verified domain
+      from: 'MLH TTU <noreply@mlhttu.org>',
       to: ttuEmail,
       subject: 'Verify your TTU Email - MLH TTU',
       html: `
@@ -86,7 +86,7 @@ export async function sendVerificationCode(
                 This code will expire in <strong>10 minutes</strong>.
               </p>
               <p style="font-size: 14px; color: #666;">
-                You have <strong>3 attempts</strong> to enter the correct code. After 3 failed attempts, your account will be removed and you'll need to sign up again.
+                You have <strong>3 attempts</strong> to enter the correct code. After 3 failed attempts, you'll need to wait a few minutes before trying again.
               </p>
             </div>
             <div style="font-size: 12px; color: #999; text-align: center; margin-top: 20px;">
@@ -181,6 +181,63 @@ export async function incrementAttempts(uid: string): Promise<number> {
   } catch (error) {
     console.error('Error incrementing attempts:', error);
     throw error;
+  }
+}
+
+/**
+ * Apply rate limiting after failed verification attempts
+ * Sets a cooldown period of 5 minutes before user can try again
+ * 
+ * @param uid - The Firebase user ID
+ * @throws Error if Firestore operation fails
+ */
+export async function applyRateLimit(uid: string): Promise<void> {
+  const db = getAdminFirestore();
+  
+  try {
+    const now = Timestamp.now();
+    const cooldownEnd = Timestamp.fromMillis(now.toMillis() + 5 * 60 * 1000); // 5 minutes
+    
+    // Update verification code document with cooldown
+    await db.collection('verificationCodes').doc(uid).update({
+      rateLimitedUntil: cooldownEnd,
+      attempts: 0, // Reset attempts after rate limit
+    });
+    
+    console.log(`Applied rate limit for user ${uid} until ${cooldownEnd.toDate()}`);
+  } catch (error) {
+    console.error('Error applying rate limit:', error);
+    throw new Error('Failed to apply rate limit.');
+  }
+}
+
+/**
+ * Check if user is currently rate limited
+ * 
+ * @param uid - The Firebase user ID
+ * @returns true if user is rate limited, false otherwise
+ */
+export async function isRateLimited(uid: string): Promise<boolean> {
+  const db = getAdminFirestore();
+  
+  try {
+    const verificationDoc = await db.collection('verificationCodes').doc(uid).get();
+    
+    if (!verificationDoc.exists) {
+      return false;
+    }
+    
+    const verificationData = verificationDoc.data() as VerificationCode & { rateLimitedUntil?: Timestamp };
+    
+    if (!verificationData.rateLimitedUntil) {
+      return false;
+    }
+    
+    const now = Timestamp.now();
+    return now.toMillis() < verificationData.rateLimitedUntil.toMillis();
+  } catch (error) {
+    console.error('Error checking rate limit:', error);
+    return false;
   }
 }
 

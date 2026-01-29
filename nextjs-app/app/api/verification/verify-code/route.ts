@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { 
   verifyCode, 
   incrementAttempts, 
-  cleanupFailedVerification 
+  applyRateLimit,
+  isRateLimited
 } from '@/lib/services/ttuEmailVerification';
 
 export async function POST(request: NextRequest) {
@@ -13,6 +14,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'UID and code are required' },
         { status: 400 }
+      );
+    }
+
+    // Check if user is rate limited
+    const rateLimited = await isRateLimited(uid);
+    if (rateLimited) {
+      return NextResponse.json(
+        { 
+          error: 'Too many failed attempts. Please wait a few minutes before trying again.',
+          rateLimited: true,
+          remainingAttempts: 0
+        },
+        { status: 429 }
       );
     }
 
@@ -29,16 +43,16 @@ export async function POST(request: NextRequest) {
       const attempts = await incrementAttempts(uid);
       const remainingAttempts = 3 - attempts;
 
-      // If max attempts reached, cleanup account
+      // If max attempts reached, apply rate limit
       if (attempts >= 3) {
-        await cleanupFailedVerification(uid);
+        await applyRateLimit(uid);
         return NextResponse.json(
           { 
-            error: 'Maximum verification attempts exceeded. Your account has been removed. Please sign up again.',
-            accountDeleted: true,
+            error: 'Maximum verification attempts exceeded. Please wait 5 minutes before trying again.',
+            rateLimited: true,
             remainingAttempts: 0
           },
-          { status: 403 }
+          { status: 429 }
         );
       }
 
