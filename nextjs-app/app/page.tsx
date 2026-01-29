@@ -127,7 +127,9 @@ export default function LandingPage() {
                         <Button 
                           onClick={async () => {
                             await signOut();
-                            window.location.reload();
+                            if (typeof window !== 'undefined') {
+                              window.location.reload();
+                            }
                           }}
                           size={isScrolled ? 'sm' : 'default'}
                           variant="outline"
@@ -259,7 +261,9 @@ export default function LandingPage() {
                         onClick={async () => {
                           await signOut();
                           setMobileMenuOpen(false);
-                          window.location.reload();
+                          if (typeof window !== 'undefined') {
+                            window.location.reload();
+                          }
                         }}
                         variant="outline"
                         className="w-full"
