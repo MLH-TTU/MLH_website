@@ -1,22 +1,120 @@
+# Dependencies
 node_modules
 dist
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Environment Variables - CRITICAL: Never commit these!
 .env
 .env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
 .env.production
-.DS_Store
+.env.production.local
+
+# Firebase - CRITICAL: Never commit these!
+firebase-admin-config.json
+*-firebase-adminsdk-*.json
+serviceAccountKey.json
+firebase-debug.log
+.firebase/
+
+# API Keys and Secrets
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.json
+credentials.json
+
+# Build outputs
+build/
+dist/
+out/
+.next/
+.vercel/
+
+# Logs
 *.log
-.vercel
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Test coverage
+coverage/
+.nyc_output/
 
 # Server uploads (keep directory structure but ignore files)
 server/uploads/*
 !server/uploads/.gitkeep
 
-# Test coverage
-coverage/
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+prisma/prisma/test.db
 
-# IDE files
+# IDE and Editor files
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
 
 # OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Package manager lock files (optional - uncomment if you want to ignore)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Cache directories
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# Sentry
+.sentryclirc
+
+# Local development
+.local/
+local/
+
+# Vercel
+.vercel
+
+# Turbo
+.turbo

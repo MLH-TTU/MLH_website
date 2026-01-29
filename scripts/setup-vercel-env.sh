@@ -25,10 +25,10 @@ echo "Enter a strong random string for JWT_SECRET"
 
 # OAuth
 vercel env add GOOGLE_CLIENT_ID production
-echo "Enter: 392800648913-djjai0spf7gnf7gc6i6ridt24f2ndub4.apps.googleusercontent.com"
+echo "Enter your Google OAuth Client ID"
 
 vercel env add GOOGLE_CLIENT_SECRET production
-echo "Enter: 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"
+echo "Enter your Google OAuth Client Secret"
 
 # Email
 vercel env add SMTP_HOST production

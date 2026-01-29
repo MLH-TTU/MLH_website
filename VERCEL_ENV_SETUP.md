@@ -20,8 +20,8 @@ JWT_SECRET="[GENERATE-STRONG-SECRET]"
 
 ### **OAuth Providers**
 ```bash
-GOOGLE_CLIENT_ID="392800648913-djjai0spf7gnf7gc6i6ridt24f2ndub4.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET="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"
+GOOGLE_CLIENT_ID="your-google-client-id-here"
+GOOGLE_CLIENT_SECRET="your-google-client-secret-here"
 ```
 
 ### **Email Configuration**

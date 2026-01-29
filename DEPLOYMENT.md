@@ -39,15 +39,15 @@ SESSION_SECRET=your-secure-session-secret
 JWT_SECRET=your-secure-jwt-secret
 
 # OAuth
-GOOGLE_CLIENT_ID=392800648913-djjai0spf7gnf7gc6i6ridt24f2ndub4.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=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
+GOOGLE_CLIENT_ID=your-google-client-id-here
+GOOGLE_CLIENT_SECRET=your-google-client-secret-here
 
 # Email
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=ttumajorleaguehacking@gmail.com
-SMTP_PASS=rzrudorbqdvolzpd
-FROM_EMAIL=ttumajorleaguehacking@gmail.com
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password-here
+FROM_EMAIL=your-email@gmail.com
 
 # URLs (update with your actual Vercel URL)
 CLIENT_URL=https://your-app-name.vercel.app
