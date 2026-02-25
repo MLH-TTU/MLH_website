@@ -73,6 +73,7 @@ export default function AdminEventsPage() {
         },
       });
       
+      
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error?.message || 'Failed to fetch events');
