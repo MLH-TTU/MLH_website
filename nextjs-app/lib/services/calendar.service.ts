@@ -87,7 +87,11 @@ export async function getAccessToken(): Promise<string> {
 export function createOutlookEvent(event: Event): OutlookEvent {
   // Convert Firestore Timestamps to ISO strings
   const startDateTime = event.startTime.toDate().toISOString();
-  const endDateTime = event.endTime.toDate().toISOString();
+  
+  // If endTime is not set, default to 2 hours after start time
+  const endDateTime = event.endTime 
+    ? event.endTime.toDate().toISOString()
+    : new Date(event.startTime.toDate().getTime() + 2 * 60 * 60 * 1000).toISOString();
   
   // Format event description with points information
   const bodyContent = `${event.description}\n\nPoints: ${event.pointsValue} XP\nLocation: ${event.location}`;

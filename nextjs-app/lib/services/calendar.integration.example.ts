@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
         name: event.name,
         description: event.description,
         startTime: event.startTime.toDate().toISOString(),
-        endTime: event.endTime.toDate().toISOString(),
+        endTime: event.endTime ? event.endTime.toDate().toISOString() : null,
         location: event.location,
         pointsValue: event.pointsValue,
         status: event.status,
