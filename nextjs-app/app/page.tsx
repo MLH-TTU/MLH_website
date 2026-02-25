@@ -151,7 +151,6 @@ export default function LandingPage() {
                   technology, innovation, and collaborative learning. We bring together developers, designers,
                   entrepreneurs, and tech enthusiasts from all backgrounds and skill levels.
                 </p>
-                </p>
                 
                 <p>
                   Through our partnership with Major League Hacking, we provide hands-on hackathons, 
