@@ -1,8 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/events/lifecycle",
-      "schedule": "*/5 * * * *"
-    }
-  ]
-}
