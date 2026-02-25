@@ -147,8 +147,8 @@ export default function LandingPage() {
 
               <div className="space-y-6 text-lg text-gray-700 dark:text-gray-300 leading-relaxed transition-colors duration-200">
                 <p>
-                  At the MLH TTU Chapter, we&apos;re a vibrant community of Texas Tech students passionate about 
-                  technology, innovation, and collaborative learning. We bring together developers, designers, 
+                  At the MLH TTU Chapter, we&apos;re a vibrant community of Texas Tech students passionate about
+                  technology, innovation, and collaborative learning. We bring together developers, designers,
                   entrepreneurs, and tech enthusiasts from all backgrounds and skill levels.
                 </p>
                 
