@@ -11,7 +11,7 @@ import { endEvent } from '@/lib/services/event.service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Verify admin authentication
   const authResult = await requireAdmin(request);
@@ -21,7 +21,7 @@ export async function POST(
   }
 
   try {
-    const eventId = params.id;
+    const { id: eventId } = await params;
 
     // End the event
     await endEvent(eventId);
