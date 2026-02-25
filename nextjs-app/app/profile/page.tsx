@@ -24,7 +24,9 @@ export default function ProfilePage() {
   const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
   const [uploadingFile, setUploadingFile] = useState(false);
-  const [activeTab, setActiveTab] = useState<'profile' | 'account'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'account' | 'activity'>('profile');
+  const [hasActiveEvents, setHasActiveEvents] = useState(false);
+  const [attendedEvents, setAttendedEvents] = useState<any[]>([]);
   
   const [editFormData, setEditFormData] = useState({
     firstName: '',
@@ -36,6 +38,22 @@ export default function ProfilePage() {
     linkedinUrl: '',
     twitterUrl: '',
   });
+
+  const loadFileUrls = async () => {
+    if (!user) return;
+    try {
+      if (user.profilePictureId) {
+        const url = await getFileUrl(user.profilePictureId);
+        setProfilePictureUrl(url);
+      }
+      if (user.resumeId) {
+        const url = await getFileUrl(user.resumeId);
+        setResumeUrl(url);
+      }
+    } catch (error) {
+      console.error('Error loading file URLs:', error);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -60,21 +78,78 @@ export default function ProfilePage() {
     }
   }, [user, loading, router]);
 
-  const loadFileUrls = async () => {
-    if (!user) return;
-    try {
-      if (user.profilePictureId) {
-        const url = await getFileUrl(user.profilePictureId);
-        setProfilePictureUrl(url);
+  // Check for active events (for non-admin users)
+  useEffect(() => {
+    const checkActiveEvents = async () => {
+      if (!user || user.isAdmin || !user.hasCompletedOnboarding) {
+        setHasActiveEvents(false);
+        return;
       }
-      if (user.resumeId) {
-        const url = await getFileUrl(user.resumeId);
-        setResumeUrl(url);
+
+      try {
+        const { auth } = await import('@/lib/firebase/config');
+        const currentUser = auth.currentUser;
+        
+        if (!currentUser) return;
+        
+        const idToken = await currentUser.getIdToken();
+        
+        const response = await fetch('/api/events/active', {
+          headers: {
+            'Authorization': `Bearer ${idToken}`,
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setHasActiveEvents(data.hasActiveEvents);
+        }
+      } catch (error) {
+        console.error('Error checking active events:', error);
       }
-    } catch (error) {
-      console.error('Error loading file URLs:', error);
-    }
-  };
+    };
+
+    checkActiveEvents();
+    const interval = setInterval(checkActiveEvents, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  // Fetch attended events
+  useEffect(() => {
+    const fetchAttendedEvents = async () => {
+      if (!user || !user.attendedEvents || user.attendedEvents.length === 0) {
+        setAttendedEvents([]);
+        return;
+      }
+
+      try {
+        const { auth } = await import('@/lib/firebase/config');
+        const currentUser = auth.currentUser;
+        
+        if (!currentUser) return;
+        
+        const idToken = await currentUser.getIdToken();
+        
+        // Fetch attended events using dedicated endpoint
+        const response = await fetch('/api/user/attended-events', {
+          headers: {
+            'Authorization': `Bearer ${idToken}`,
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setAttendedEvents(data.data);
+        } else {
+          console.error('Failed to fetch attended events:', response.status);
+        }
+      } catch (error) {
+        console.error('Error fetching attended events:', error);
+      }
+    };
+
+    fetchAttendedEvents();
+  }, [user?.attendedEvents, user?.uid]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -104,6 +179,7 @@ export default function ProfilePage() {
       setSaveLoading(true);
       await updateUserProfile(user.uid, editFormData);
       await refreshUser();
+      await loadFileUrls(); // Reload file URLs after saving
       toast.showSuccess(SUCCESS_MESSAGES.PROFILE_UPDATED);
       setIsEditing(false);
     } catch (error) {
@@ -120,16 +196,34 @@ export default function ProfilePage() {
     if (!user) return;
     try {
       setUploadingFile(true);
+      console.log('Starting file upload:', { type, fileName: file.name, fileSize: file.size });
+      
       if (type === 'profile-picture') {
+        console.log('Uploading profile picture...');
         const result = await uploadProfilePicture(file, user.uid);
+        console.log('Profile picture uploaded:', result);
+        
+        console.log('Updating user profile with profilePictureId:', result.fileId);
         await updateUserProfile(user.uid, { profilePictureId: result.fileId });
+        
+        console.log('Refreshing user...');
         await refreshUser();
+        
+        console.log('Setting profile picture URL:', result.downloadUrl);
         setProfilePictureUrl(result.downloadUrl);
         toast.showSuccess(SUCCESS_MESSAGES.FILE_UPLOADED);
       } else {
+        console.log('Uploading resume...');
         const result = await uploadResume(file, user.uid);
+        console.log('Resume uploaded:', result);
+        
+        console.log('Updating user profile with resumeId:', result.fileId);
         await updateUserProfile(user.uid, { resumeId: result.fileId });
+        
+        console.log('Refreshing user...');
         await refreshUser();
+        
+        console.log('Setting resume URL:', result.downloadUrl);
         setResumeUrl(result.downloadUrl);
         toast.showSuccess(SUCCESS_MESSAGES.FILE_UPLOADED);
       }
@@ -145,6 +239,7 @@ export default function ProfilePage() {
         });
       }
     } finally {
+      console.log('File upload complete, setting uploadingFile to false');
       setUploadingFile(false);
     }
   };
@@ -178,6 +273,18 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+        
+        {/* Speech Bubble for Active Events (non-admin only) */}
+        {!user?.isAdmin && hasActiveEvents && (
+          <div className="absolute top-full right-8 mt-2 animate-bounce">
+            <div className="relative bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+              <div className="absolute -top-2 right-4 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-green-500"></div>
+              <p className="text-sm font-medium whitespace-nowrap">
+                🎉 Event is ongoing! Enter code →
+              </p>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Main Content */}
@@ -238,6 +345,17 @@ export default function ProfilePage() {
                 }`}
               >
                 Profile Information
+              </Button>
+              <Button
+                onClick={() => setActiveTab('activity')}
+                variant="ghost"
+                className={`rounded-none border-b-2 ${
+                  activeTab === 'activity'
+                    ? 'border-red-600 text-red-600 dark:text-red-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                }`}
+              >
+                Events & Points
               </Button>
               <Button
                 onClick={() => setActiveTab('account')}
@@ -542,6 +660,120 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Activity Tab */}
+        {activeTab === 'activity' && (
+          <div className={`space-y-6 ${!prefersReducedMotion ? 'animate-on-load animate-fade-in animation-delay-300' : ''}`}>
+            {/* Points Summary Card */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200">
+              <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 p-1">
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Total Points */}
+                    <div className="text-center md:text-left">
+                      <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+                        Total Points
+                      </p>
+                      <div className="flex items-center justify-center md:justify-start gap-4">
+                        <div className="relative">
+                          <svg className="w-20 h-20 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-full animate-pulse"></div>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-6xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                            {user.points || 0}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">points earned</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Events Attended */}
+                    <div className="text-center md:text-right border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 pt-8 md:pt-0 md:pl-8">
+                      <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+                        Events Attended
+                      </p>
+                      <div className="flex items-center justify-center md:justify-end gap-4">
+                        <div>
+                          <p className="text-6xl font-bold text-gray-900 dark:text-white">
+                            {user.attendedEvents?.length || 0}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            {user.attendedEvents?.length === 1 ? 'event' : 'events'}
+                          </p>
+                        </div>
+                        <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-lg">
+                          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Attended Events List */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-200">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Attended Events</h2>
+              
+              {attendedEvents.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="mx-auto mb-4 w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    No Events Attended Yet
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Attend events and enter attendance codes to earn points!
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {attendedEvents.map((event) => {
+                    const startDate = new Date(event.startTime);
+                    return (
+                      <div
+                        key={event.id}
+                        className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                            {event.name}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {startDate.toLocaleDateString('en-US', {
+                              weekday: 'long',
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+                          <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                          <span className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
+                            +{event.pointsValue}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         )}

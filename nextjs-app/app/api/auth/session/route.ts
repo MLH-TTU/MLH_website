@@ -1,27 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTokens } from 'next-firebase-auth-edge';
-import { cookies } from 'next/headers';
 
 // Cookie configuration
 const COOKIE_NAME = 'AuthToken';
 const COOKIE_SIGNATURE_NAME = 'AuthToken.sig';
 const MAX_AGE = 60 * 60 * 24 * 5; // 5 days
-
-// Get Firebase configuration from environment
-function getFirebaseConfig() {
-  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-  const cookieSecret = process.env.FIREBASE_AUTH_COOKIE_SECRET;
-
-  if (!apiKey) {
-    throw new Error('NEXT_PUBLIC_FIREBASE_API_KEY is not set');
-  }
-
-  if (!cookieSecret) {
-    throw new Error('FIREBASE_AUTH_COOKIE_SECRET is not set');
-  }
-
-  return { apiKey, cookieSecret };
-}
 
 // POST /api/auth/session - Set auth cookies
 export async function POST(request: NextRequest) {
@@ -34,23 +16,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    const { apiKey, cookieSecret } = getFirebaseConfig();
-
-    // Get cookies (await in Next.js 16+)
-    const cookieStore = await cookies();
-
-    // Generate secure cookies using next-firebase-auth-edge
-    const tokens = await getTokens(cookieStore, {
-      apiKey,
-      cookieName: COOKIE_NAME,
-      cookieSignatureKeys: [cookieSecret],
-      serviceAccount: {
-        projectId: process.env.FIREBASE_PROJECT_ID!,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-      },
-    });
 
     // Set the auth cookies
     const response = NextResponse.json({ success: true });

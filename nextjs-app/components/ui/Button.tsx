@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-type ButtonVariant = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'success';
+type ButtonVariant = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'success' | 'warning';
 type ButtonSize = 'default' | 'sm' | 'lg' | 'icon';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -17,6 +17,7 @@ const getVariantClasses = (variant: ButtonVariant = 'default'): string => {
     ghost: 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white',
     link: 'text-red-600 dark:text-red-400 underline-offset-4 hover:underline',
     success: 'bg-green-600 text-white hover:bg-green-700 focus-visible:ring-green-500 shadow-md hover:shadow-lg',
+    warning: 'bg-yellow-600 text-white hover:bg-yellow-700 focus-visible:ring-yellow-500 shadow-md hover:shadow-lg',
   };
   return variants[variant];
 };

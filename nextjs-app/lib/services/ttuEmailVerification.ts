@@ -65,7 +65,7 @@ export async function sendVerificationCode(
     console.log('Sending verification email to:', ttuEmail);
     
     const emailResult = await resend.emails.send({
-      from: 'MLH TTU <noreply@mlhttu.org>',
+      from: 'MLH TTU <verify@mlhttu.org>',
       to: ttuEmail,
       subject: 'Verify your TTU Email - MLH TTU',
       html: `

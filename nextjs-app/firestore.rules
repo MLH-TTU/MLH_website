@@ -18,24 +18,29 @@ service cloud.firestore {
       return request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'email']);
     }
     
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Events collection
+    match /events/{eventId} {
+      // All authenticated users can read events
+      allow read: if isAuthenticated();
+      
+      // Only admins can write to events collection
+      allow create, update, delete: if isAdmin();
+    }
+    
     // Users collection
     match /users/{uid} {
       // Users can read their own profile
-      allow read: if isOwner(uid);
+      // Admins can read all user documents
+      allow read: if isOwner(uid) || isAdmin();
       
-      // Users can create their own profile (first-time auth)
-      // Must set uid to match the document ID and auth uid
-      allow create: if isOwner(uid) 
-        && request.resource.data.uid == uid
-        && request.resource.data.uid == request.auth.uid;
-      
-      // Users can update their own profile
-      // Cannot modify uid or email fields
-      allow update: if isOwner(uid) && !isModifyingProtectedFields();
-      
-      // Only server-side (Admin SDK) can delete
-      // Client-side deletions are not allowed
-      allow delete: if false;
+      // Only server-side (Admin SDK) can write to users collection
+      // Client-side write operations are not allowed
+      allow create, update, delete: if false;
     }
     
     // Verification codes collection

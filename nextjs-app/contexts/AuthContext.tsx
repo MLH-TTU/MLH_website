@@ -61,7 +61,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (err) {
       console.error('Error fetching user profile:', err);
-      throw err;
+      // Don't throw - return null to allow the app to continue
+      return null;
     }
   };
 
@@ -145,15 +146,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Listen for auth state changes
   useEffect(() => {
+    // Set a timeout to ensure we don't stay in loading state forever
+    const loadingTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn('Auth loading timeout - forcing loading to false');
+        setLoading(false);
+        setUser(null);
+      }
+    }, 5000); // 5 second timeout
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      clearTimeout(loadingTimeout); // Clear timeout if auth state changes
+      
       try {
         if (firebaseUser) {
           // Store token in cookie
           await storeAuthToken(firebaseUser);
 
-          // Fetch user profile
+          // Fetch user profile (returns null on error, doesn't throw)
           const userProfile = await fetchUserProfile(firebaseUser);
-          setUser(userProfile);
+          
+          if (userProfile) {
+            setUser(userProfile);
+          } else {
+            // Profile fetch failed but user is authenticated
+            // This could be a new user or a Firestore error
+            console.warn('User authenticated but profile not available');
+            setUser(null);
+            setError('Unable to load user profile. Please try signing in again.');
+          }
         } else {
           setUser(null);
         }
@@ -166,7 +187,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(loadingTimeout);
+      unsubscribe();
+    };
   }, []);
 
   const value: AuthContextValue = {

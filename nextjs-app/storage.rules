@@ -26,8 +26,8 @@ service firebase.storage {
     
     // User profile pictures
     match /users/{uid}/profile-picture/{fileName} {
-      // Users can read their own profile picture
-      allow read: if isOwner(uid);
+      // Anyone can read profile pictures (for public profiles)
+      allow read: if true;
       
       // Users can upload their own profile picture
       // Must be an image and under 5MB
@@ -38,8 +38,8 @@ service firebase.storage {
     
     // User resumes
     match /users/{uid}/resume/{fileName} {
-      // Users can read their own resume
-      allow read: if isOwner(uid);
+      // Anyone can read resumes (for sharing with recruiters)
+      allow read: if true;
       
       // Users can upload their own resume
       // Must be PDF or DOCX and under 10MB

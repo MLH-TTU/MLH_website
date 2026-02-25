@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "verify:profiles": "tsx --env-file=.env.local verify-user-profiles.ts"
+    "verify:profiles": "tsx --env-file=.env.local verify-user-profiles.ts",
+    "migrate:users": "tsx --env-file=.env.local scripts/migrate-users.ts",
+    "make-admin": "tsx --env-file=.env.local scripts/make-admin.ts",
+    "check-user": "tsx --env-file=.env.local scripts/check-user.ts"
   },
   "dependencies": {
     "@radix-ui/react-toast": "^1.2.15",

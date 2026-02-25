@@ -4,3 +4,6 @@ export { ToastProvider, useToast } from './ToastContainer';
 export type { ToastType, ToastProps } from './Toast';
 export { ThemeToggle } from './ThemeToggle';
 export { LoadingScreen } from './LoadingScreen';
+export { EventCard } from './EventCard';
+export { AttendanceCodeInput } from './AttendanceCodeInput';
+export { AdminEventControls } from './AdminEventControls';

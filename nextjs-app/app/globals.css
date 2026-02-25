@@ -67,3 +67,53 @@ body {
 .animate-pulse-scale {
   animation: pulse-scale 3s ease-in-out infinite;
 }
+
+/* Custom Scrollbar Styles - shadcn/ui inspired */
+/* For Webkit browsers (Chrome, Safari, Edge) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(203 213 225 / 0.5); /* slate-300 with opacity */
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(148 163 184 / 0.7); /* slate-400 with opacity */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Dark mode scrollbar */
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(71 85 105 / 0.5); /* slate-600 with opacity */
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139 / 0.7); /* slate-500 with opacity */
+}
+
+/* For Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(203 213 225 / 0.5) transparent;
+}
+
+.dark .custom-scrollbar {
+  scrollbar-color: rgb(71 85 105 / 0.5) transparent;
+}
+
+/* Smooth scrolling */
+.custom-scrollbar {
+  scroll-behavior: smooth;
+}

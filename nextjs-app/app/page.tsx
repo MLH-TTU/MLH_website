@@ -1,30 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/Button';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import Navigation from '@/components/Navigation';
+import { Leaderboard } from '@/components/Leaderboard';
 
 export default function LandingPage() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, loading, signOut } = useAuth();
-  const router = useRouter();
+  const { loading } = useAuth();
   const prefersReducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      setIsScrolled(scrollTop > 50);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Show loading screen while auth state is being determined
   if (loading) {
@@ -33,269 +18,8 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 font-sans transition-colors duration-200">
-      {/* Dynamic Navbar */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'py-2' : 'py-3'
-      } ${!prefersReducedMotion ? 'animate-on-load animate-fade-in' : ''}`}>
-        <div className={`mx-auto transition-all duration-300 ${
-          isScrolled 
-            ? 'max-w-4xl' 
-            : 'max-w-7xl'
-        }`}>
-          <div 
-            className={`transition-all duration-300 ${
-              isScrolled
-                ? 'mx-auto w-fit rounded-full px-4 md:px-8 py-3 bg-white/10 dark:bg-gray-800/30 backdrop-blur-[20px] backdrop-saturate-[180%] border border-white/20 dark:border-gray-700/30 shadow-[0_8px_32px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.3)]'
-                : 'px-4 md:px-8 py-4 rounded-none'
-            }`}
-          >
-            <div className={`flex items-center justify-between ${
-              isScrolled ? 'md:min-w-[900px]' : ''
-            }`}>
-              {/* Left side - Logo/Brand */}
-              <div className="flex items-center space-x-4">
-                <img 
-                  src="https://static.mlh.io/brand-assets/logo/official/mlh-logo-color.png?_gl=1*1c1b6mh*_ga*MTYxMTA5MjU0NC4xNzY4NjcxMDIw*_ga_E5KT6TC4TK*czE3NjkyODk3ODUkbzQkZzAkdDE3NjkyODk3ODgkajU3JGwwJGgw" 
-                  alt="MLH Logo" 
-                  className={`w-auto transition-all duration-300 ${
-                    isScrolled ? 'h-6' : 'h-7'
-                  }`}
-                />
-                {/* Vertical separator line */}
-                <div className={`w-px bg-gray-400 transition-all duration-300 ${
-                  isScrolled ? 'h-7' : 'h-8'
-                }`}></div>
-                {/* TTU Logo */}
-                <img 
-                  src="https://www.ttu.edu/traditions/images/DoubleT.gif" 
-                  alt="TTU Logo" 
-                  className={`w-auto transition-all duration-300 ${
-                    isScrolled ? 'h-6' : 'h-7'
-                  }`}
-                />
-              </div>
-              
-              {/* Desktop Navigation - Hidden on mobile */}
-              <div className="hidden md:flex items-center space-x-8">
-                <a href="#about" className={`text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors ${
-                  isScrolled ? 'text-sm' : 'text-base'
-                }`}>
-                  About
-                </a>
-                <a href="#events" className={`text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors ${
-                  isScrolled ? 'text-sm' : 'text-base'
-                }`}>
-                  Events
-                </a>
-                <Link href="/team" className={`text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors ${
-                  isScrolled ? 'text-sm' : 'text-base'
-                }`}>
-                  Team
-                </Link>
-                
-                {/* Theme Toggle */}
-                <ThemeToggle />
-                
-                {/* Auth buttons */}
-                <div className="flex items-center space-x-4">
-                  {loading ? (
-                    <div className="w-20 h-9 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
-                  ) : user ? (
-                    user.hasCompletedOnboarding ? (
-                      <>
-                        <span className={`text-gray-600 dark:text-gray-300 ${
-                          isScrolled ? 'text-sm' : 'text-base'
-                        }`}>
-                          Welcome, {user.firstName || user.email}
-                        </span>
-                        <Button 
-                          onClick={() => router.push('/profile')}
-                          size={isScrolled ? 'sm' : 'default'}
-                        >
-                          Profile
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button 
-                          onClick={() => router.push('/onboarding')}
-                          size={isScrolled ? 'sm' : 'default'}
-                          variant="default"
-                        >
-                          Complete Onboarding
-                        </Button>
-                        <Button 
-                          onClick={async () => {
-                            await signOut();
-                            if (typeof window !== 'undefined') {
-                              window.location.reload();
-                            }
-                          }}
-                          size={isScrolled ? 'sm' : 'default'}
-                          variant="outline"
-                        >
-                          Sign Out
-                        </Button>
-                      </>
-                    )
-                  ) : (
-                    <Button 
-                      onClick={() => router.push('/login')}
-                      size={isScrolled ? 'sm' : 'default'}
-                    >
-                      Sign In
-                    </Button>
-                  )}
-                </div>
-                
-                <Button 
-                  variant="secondary"
-                  size={isScrolled ? 'sm' : 'default'}
-                >
-                  Join Discord
-                </Button>
-              </div>
-
-              {/* Mobile menu button */}
-              <div className="flex md:hidden items-center gap-2">
-                <ThemeToggle />
-                <Button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  variant="ghost"
-                  size="icon"
-                  className="min-w-[44px] min-h-[44px]"
-                  aria-controls="mobile-menu"
-                  aria-expanded={mobileMenuOpen}
-                >
-                  <span className="sr-only">{mobileMenuOpen ? 'Close main menu' : 'Open main menu'}</span>
-                  {mobileMenuOpen ? (
-                    <svg
-                      className="block h-6 w-6"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="block h-6 w-6"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Navigation Menu */}
-          {mobileMenuOpen && (
-            <div className="md:hidden mt-2 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <div className="px-4 pt-2 pb-3 space-y-3">
-                <a 
-                  href="#about" 
-                  className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-3 rounded-md text-base font-medium transition-colors duration-100 min-h-[44px]"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  About
-                </a>
-                <a 
-                  href="#events" 
-                  className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-3 rounded-md text-base font-medium transition-colors duration-100 min-h-[44px]"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Events
-                </a>
-                <Link 
-                  href="/team" 
-                  className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-3 rounded-md text-base font-medium transition-colors duration-100 min-h-[44px]"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Team
-                </Link>
-                
-                {/* Auth buttons for mobile */}
-                {loading ? (
-                  <div className="px-3 py-2">
-                    <div className="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                  </div>
-                ) : user ? (
-                  user.hasCompletedOnboarding ? (
-                    <>
-                      <div className="px-3 py-2 text-gray-600 dark:text-gray-300 text-base">
-                        Welcome, {user.firstName || user.email}
-                      </div>
-                      <Button 
-                        onClick={() => {
-                          router.push('/profile');
-                          setMobileMenuOpen(false);
-                        }}
-                        className="w-full"
-                      >
-                        Profile
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button 
-                        onClick={() => {
-                          router.push('/onboarding');
-                          setMobileMenuOpen(false);
-                        }}
-                        className="w-full"
-                      >
-                        Complete Onboarding
-                      </Button>
-                      <Button 
-                        onClick={async () => {
-                          await signOut();
-                          setMobileMenuOpen(false);
-                          if (typeof window !== 'undefined') {
-                            window.location.reload();
-                          }
-                        }}
-                        variant="outline"
-                        className="w-full"
-                      >
-                        Sign Out
-                      </Button>
-                    </>
-                  )
-                ) : (
-                  <Button 
-                    onClick={() => {
-                      router.push('/login');
-                      setMobileMenuOpen(false);
-                    }}
-                    className="w-full"
-                  >
-                    Sign In
-                  </Button>
-                )}
-                
-                <Button 
-                  onClick={() => setMobileMenuOpen(false)}
-                  variant="secondary"
-                  className="w-full"
-                >
-                  Join Discord
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </nav>
+      {/* Use Navigation component */}
+      <Navigation />
 
       {/* Hero Section */}
       <main className="min-h-screen flex items-center justify-center px-4 pt-32 md:pt-36 pb-20">
@@ -442,6 +166,25 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Leaderboard Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 transition-colors duration-200">
+        <div className="max-w-5xl mx-auto px-8">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6 transition-colors duration-200">
+              Top Contributors
+            </h2>
+            <div className="w-16 h-1 bg-yellow-500 mx-auto mb-8"></div>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto transition-colors duration-200">
+              Celebrating our most active members who make our community thrive
+            </p>
+          </div>
+
+          {/* Leaderboard */}
+          <Leaderboard />
         </div>
       </section>
 

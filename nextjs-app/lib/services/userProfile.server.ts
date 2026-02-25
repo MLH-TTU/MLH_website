@@ -3,6 +3,18 @@ import { getAdminFirestore, getAdminAuth } from '../firebase/admin';
 import type { Timestamp } from 'firebase-admin/firestore';
 
 /**
+ * Attended event metadata stored in user's attendedEvents array
+ */
+export interface AttendedEvent {
+  eventId: string;               // Reference to event document
+  eventName: string;             // Event name (denormalized)
+  eventDate: Timestamp;          // Event date (denormalized)
+  location: string;              // Event location (denormalized)
+  pointsEarned: number;          // Points earned from this event
+  attendedAt: Timestamp;         // When attendance was recorded
+}
+
+/**
  * User Profile interface matching Firestore schema
  */
 export interface UserProfile {
@@ -33,6 +45,11 @@ export interface UserProfile {
   // Files
   profilePictureId?: string;
   resumeId?: string;
+  
+  // Admin and Event Management
+  isAdmin: boolean;              // Admin role flag (default: false)
+  points: number;                // Total accumulated points (default: 0)
+  attendedEvents: AttendedEvent[]; // Array of attended event details
   
   // Metadata
   createdAt: Timestamp;
@@ -82,6 +99,9 @@ export async function createUserProfile(
     const profileData: Partial<UserProfile> = {
       uid,
       hasCompletedOnboarding: false,
+      isAdmin: false,              // Default to non-admin
+      points: 0,                   // Default to 0 points
+      attendedEvents: [],          // Default to empty array
       ...data,
       createdAt: now as any,
       updatedAt: now as any,
@@ -113,9 +133,10 @@ export async function updateUserProfile(
       updatedAt: now,
     };
     
-    // Remove uid and email from update data to prevent modification
+    // Remove uid, email, and isAdmin from update data to prevent modification
     delete (updateData as any).uid;
     delete (updateData as any).email;
+    delete (updateData as any).isAdmin;  // Prevent role modification through app interface
     
     await userRef.update(updateData);
   } catch (error) {
