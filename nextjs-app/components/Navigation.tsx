@@ -131,16 +131,16 @@ export default function Navigation() {
             
             {/* Desktop Navigation - Hidden on mobile */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="/#about" className={`text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors ${
+              <Link href="/#about" className={`text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors ${
                 isScrolled ? 'text-sm' : 'text-base'
               }`}>
                 About
-              </a>
-              <a href="/#events" className={`text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors ${
+              </Link>
+              <Link href="/#events" className={`text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors ${
                 isScrolled ? 'text-sm' : 'text-base'
               }`}>
                 Events
-              </a>
+              </Link>
               <Link href="/team" className={`text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors ${
                 isScrolled ? 'text-sm' : 'text-base'
               }`}>
@@ -321,20 +321,20 @@ export default function Navigation() {
         {mobileMenuOpen && (
           <div className="md:hidden mt-2 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="px-4 pt-2 pb-3 space-y-3">
-              <a 
+              <Link 
                 href="/#about" 
                 className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-3 rounded-md text-base font-medium transition-colors duration-100 min-h-[44px]"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 About
-              </a>
-              <a 
+              </Link>
+              <Link 
                 href="/#events" 
                 className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-3 rounded-md text-base font-medium transition-colors duration-100 min-h-[44px]"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Events
-              </a>
+              </Link>
               <Link 
                 href="/team" 
                 className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-3 rounded-md text-base font-medium transition-colors duration-100 min-h-[44px]"
