@@ -4,45 +4,19 @@
 
 /* Prevent flash of light theme on page load */
 html {
-  background-color: #ffffff;
+  background: linear-gradient(to bottom right, #f9fafb, #ffffff, #f3f4f6);
   color-scheme: light;
 }
 
 html.dark {
-  background-color: #111827;
+  background: linear-gradient(to bottom right, #111827, #1f2937, #111827);
   color-scheme: dark;
 }
 
-/* Prevent navbar flash - apply dark styles immediately */
-@media (prefers-color-scheme: dark) {
-  html:not(.light) {
-    background-color: #111827;
-  }
-  
-  /* Target navbar glassmorphism backgrounds before React hydrates */
-  html:not(.light) nav [class*="bg-white/10"] {
-    background-color: rgba(31, 41, 55, 0.3) !important;
-  }
-  
-  html:not(.light) nav [class*="backdrop-blur"] {
-    backdrop-filter: blur(20px) saturate(180%);
-  }
-}
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-/* Remove body background/color to let Tailwind dark mode work */
+/* Ensure body inherits background immediately */
 body {
+  background: transparent;
+  min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -66,6 +40,32 @@ body {
 
 .animate-pulse-scale {
   animation: pulse-scale 3s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
 /* Custom Scrollbar Styles - shadcn/ui inspired */

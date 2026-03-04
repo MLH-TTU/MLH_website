@@ -17,6 +17,7 @@
     "concurrently": "^8.2.2"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "gasp": "^0.0.2"
   }
 }
