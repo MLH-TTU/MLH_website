@@ -266,12 +266,18 @@ export default function Navigation() {
                 )}
               </div>
               
-              <Button 
-                variant="secondary"
-                size={isScrolled ? 'sm' : 'default'}
+              <a 
+                href="https://discord.com/invite/6nBEZhegGK"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                Join Discord
-              </Button>
+                <Button 
+                  variant="secondary"
+                  size={isScrolled ? 'sm' : 'default'}
+                >
+                  Join Discord
+                </Button>
+              </a>
             </div>
 
             {/* Mobile menu button */}
@@ -454,13 +460,19 @@ export default function Navigation() {
                 </Button>
               )}
               
-              <Button 
-                onClick={() => setMobileMenuOpen(false)}
-                variant="secondary"
-                className="w-full"
+              <a 
+                href="https://discord.com/invite/6nBEZhegGK"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                Join Discord
-              </Button>
+                <Button 
+                  onClick={() => setMobileMenuOpen(false)}
+                  variant="secondary"
+                  className="w-full"
+                >
+                  Join Discord
+                </Button>
+              </a>
             </div>
           </div>
         )}

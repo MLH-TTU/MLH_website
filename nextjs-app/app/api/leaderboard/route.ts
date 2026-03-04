@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminFirestore } from '@/lib/firebase/admin';
+import { getAdminFirestore, getAdminStorage } from '@/lib/firebase/admin';
 
 /**
  * GET /api/leaderboard
@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
     }
     
     const db = getAdminFirestore();
+    const storage = getAdminStorage();
     
     // Query all users who have completed onboarding
     const snapshot = await db.collection('users')
@@ -43,17 +44,39 @@ export async function GET(request: NextRequest) {
       .get();
     
     // Get all users and sort by points in memory
-    const allUsers = snapshot.docs.map(doc => {
+    const allUsersPromises = snapshot.docs.map(async (doc) => {
       const data = doc.data();
+      
+      // Prioritize uploaded profile picture over Google photo
+      let photoURL = data.photoURL || null;
+      
+      // If user uploaded a profile picture during onboarding, use that instead
+      if (data.profilePictureId) {
+        try {
+          const bucket = storage.bucket();
+          const file = bucket.file(data.profilePictureId);
+          const [url] = await file.getSignedUrl({
+            action: 'read',
+            expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+          });
+          photoURL = url;
+        } catch (error) {
+          console.error('Error getting profile picture URL:', error);
+          // Fall back to Google photo if storage fetch fails
+        }
+      }
+      
       return {
         id: doc.id,
         firstName: data.firstName || 'Anonymous',
         lastName: data.lastName || '',
-        photoURL: data.photoURL || null,
+        photoURL,
         points: data.points || 0,
         attendedEvents: data.attendedEvents?.length || 0,
       };
     });
+    
+    const allUsers = await Promise.all(allUsersPromises);
     
     // Sort by points (descending) and take top N
     const leaderboard = allUsers

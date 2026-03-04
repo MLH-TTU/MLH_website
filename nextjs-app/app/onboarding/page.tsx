@@ -179,12 +179,14 @@ export default function OnboardingPage() {
 
       // Upload files if provided
       let profilePictureId: string | undefined;
+      let profilePictureUrl: string | undefined;
       let resumeId: string | undefined;
 
       if (formData.profilePicture) {
         try {
           const result = await uploadProfilePicture(formData.profilePicture, user.uid);
           profilePictureId = result.fileId;
+          profilePictureUrl = result.downloadUrl;
           toast.showSuccess(SUCCESS_MESSAGES.FILE_UPLOADED);
         } catch (err: any) {
           toast.showError(ERROR_MESSAGES.FILE_UPLOAD_FAILED, {
@@ -224,7 +226,11 @@ export default function OnboardingPage() {
         if (formData.githubUrl) profileUpdate.githubUrl = formData.githubUrl;
         if (formData.linkedinUrl) profileUpdate.linkedinUrl = formData.linkedinUrl;
         if (formData.twitterUrl) profileUpdate.twitterUrl = formData.twitterUrl;
-        if (profilePictureId) profileUpdate.profilePictureId = profilePictureId;
+        if (profilePictureId) {
+          profileUpdate.profilePictureId = profilePictureId;
+          // Update photoURL to use the uploaded profile picture instead of Google photo
+          profileUpdate.photoURL = profilePictureUrl;
+        }
         if (resumeId) profileUpdate.resumeId = resumeId;
 
         await updateUserProfile(user.uid, profileUpdate);

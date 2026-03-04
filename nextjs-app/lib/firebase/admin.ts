@@ -2,6 +2,7 @@ import 'server-only';
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
 import { getAuth, Auth } from 'firebase-admin/auth';
 import { getFirestore, Firestore } from 'firebase-admin/firestore';
+import { getStorage, Storage } from 'firebase-admin/storage';
 
 // Firebase Admin configuration interface
 interface FirebaseAdminConfig {
@@ -44,6 +45,7 @@ function validateAdminConfig(): FirebaseAdminConfig {
 let adminApp: App;
 let adminAuth: Auth;
 let adminFirestore: Firestore;
+let adminStorage: Storage;
 
 try {
   const config = validateAdminConfig();
@@ -74,6 +76,7 @@ try {
   // Initialize Firebase Admin services
   adminAuth = getAuth(adminApp);
   adminFirestore = getFirestore(adminApp);
+  adminStorage = getStorage(adminApp);
   
   console.log('Firebase Admin services initialized');
 } catch (error) {
@@ -82,8 +85,9 @@ try {
 }
 
 // Export Firebase Admin services
-export { adminApp, adminAuth, adminFirestore };
+export { adminApp, adminAuth, adminFirestore, adminStorage };
 
 // Export getter functions for use in server components and API routes
 export const getAdminAuth = () => adminAuth;
 export const getAdminFirestore = () => adminFirestore;
+export const getAdminStorage = () => adminStorage;
