@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import Link from "next/link";
 import gsap from "gsap";
 
 const TEXT = "Coming Soon";
@@ -86,7 +87,7 @@ export default function ComingSoonPage() {
   return (
     <main className="min-h-screen w-full bg-black relative">
       {/* Back to Home Button */}
-      <a
+      <Link
         href="/"
         className="absolute top-8 left-8 z-50 group flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full text-white font-semibold transition-all duration-300 hover:scale-105 active:scale-95 ring-1 ring-white/20 hover:ring-white/40"
       >
@@ -99,7 +100,7 @@ export default function ComingSoonPage() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
         Back to Home
-      </a>
+      </Link>
 
       {/* hidden until GSAP sets autoAlpha=1 */}
       <div
